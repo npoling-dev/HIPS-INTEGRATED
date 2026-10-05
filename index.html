@@ -3,939 +3,1743 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TAMU High-Impact Practices (HIPs) Master Suite</title>
-  <!-- Tailwind CSS -->
+  <title>TAMU High-Impact Practices (HIPs) Course Profile Tool</title>
+  
+  <!-- Tailwind CSS, Chart.js & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      corePlugins: {
+        preflight: false
+      }
+    }
+  </script>
+
   <style>
-    .drawer-transform {
-      transition: transform 0.3s ease-in-out;
+    :root {
+      --tamu-maroon: #500000;
+      --tamu-dark-maroon: #3c0000;
+      --tamu-slate: #1e293b;
+      --tamu-steel: #475569;
+      --tamu-light-steel: #64748b;
+      --tamu-bg: #f8fafc;
+      --tamu-cell-bg: #f1f5f9;
+      --tamu-card-bg: #ffffff;
+      --tamu-border: #cbd5e1;
+      --tamu-border-light: #e2e8f0;
+      
+      --stem-accent: #0284c7;
+      --nonstem-accent: #500000;
+      --cocurricular-accent: #334155;
+      --ulo-badge-bg: #e0f2fe;
+      --ulo-badge-text: #0369a1;
     }
-    .scrollbar-thin::-webkit-scrollbar {
-      width: 6px;
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--tamu-bg);
+      color: var(--tamu-slate);
+      line-height: 1.6;
     }
-    .scrollbar-thin::-webkit-scrollbar-thumb {
-      background-color: #cbd5e1;
-      border-radius: 3px;
+
+    #indexToolContainer * {
+      box-sizing: border-box;
     }
-    .tab-active {
-      border-bottom: 3px solid #6366f1;
-      color: #ffffff !important;
+
+    #indexToolContainer {
+      padding: 24px;
+    }
+
+    #indexToolContainer .container {
+      max-width: 1500px;
+      margin: 0 auto;
+    }
+
+    header.main-header {
+      background: var(--tamu-maroon);
+      color: #ffffff;
+      padding: 32px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      border-bottom: 4px solid var(--tamu-slate);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    header.main-header h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+      color: #ffffff;
+    }
+
+    header.main-header p {
+      font-size: 0.95rem;
+      opacity: 0.92;
+      font-weight: 400;
+      color: #ffffff;
+    }
+
+    .rationale-section {
+      background: var(--tamu-card-bg);
+      border: 1px solid var(--tamu-border);
+      border-left: 5px solid var(--tamu-steel);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+
+    .rationale-section h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--tamu-slate);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .rationale-section p {
+      font-size: 0.9rem;
+      color: var(--tamu-steel);
+      line-height: 1.6;
+    }
+
+    /* Single Level Tab Navigation */
+    .tool-nav {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 3px solid var(--tamu-maroon);
+      padding-bottom: 0px;
+      position: sticky;
+      top: 0;
+      background: var(--tamu-bg);
+      z-index: 100;
+      padding-top: 8px;
+    }
+
+    .nav-tab {
+      background: #e2e8f0;
+      border: 1px solid var(--tamu-border);
+      border-bottom: none;
+      padding: 14px 24px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--tamu-steel);
+      cursor: pointer;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tab:hover {
+      background: #cbd5e1;
+      color: var(--tamu-slate);
+    }
+
+    .nav-tab.active {
+      background: var(--tamu-maroon);
+      color: #ffffff;
+      border-color: var(--tamu-maroon);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Matrix Table Layout */
+    .matrix-wrapper {
+      overflow-x: auto;
+      background: var(--tamu-card-bg);
+      border-radius: 8px;
+      padding: 24px;
+      border: 1px solid var(--tamu-border);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: 290px repeat(3, 1fr);
+      gap: 16px;
+      min-width: 1150px;
+    }
+
+    .grid-header {
+      background: var(--tamu-slate);
+      color: #ffffff;
+      padding: 16px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .quadrant-row-header {
+      grid-column: span 4;
+      background: var(--tamu-dark-maroon);
+      color: #ffffff;
+      padding: 14px 20px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border-radius: 6px;
+      margin-top: 20px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .element-title-cell {
+      background: var(--tamu-card-bg);
+      padding: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--tamu-border);
+      border-left: 5px solid var(--tamu-maroon);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .element-title-cell h3 {
+      font-size: 0.98rem;
+      color: var(--tamu-maroon);
+      margin-bottom: 8px;
       font-weight: 700;
     }
-    @media print {
-      header, nav, button, #actionDrawer, #drawerBackdrop, #toast, .no-print {
-        display: none !important;
-      }
-      body {
-        background-color: white !important;
-        color: black !important;
-      }
-      .tab-content {
-        display: block !important;
-        page-break-after: always;
-      }
-      .print-full-width {
-        width: 100% !important;
-        max-width: none !important;
-      }
+
+    .element-title-cell p {
+      font-size: 0.82rem;
+      color: var(--tamu-steel);
+      line-height: 1.5;
     }
+
+    .matrix-cell {
+      background: var(--tamu-cell-bg);
+      padding: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--tamu-border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .cell-desc {
+      font-size: 0.85rem;
+      color: var(--tamu-slate);
+      line-height: 1.55;
+    }
+
+    .track-triggers {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: auto;
+    }
+
+    .track-btn {
+      background: #ffffff;
+      border: 1px solid var(--tamu-border);
+      color: var(--tamu-slate);
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.15s ease-in-out;
+    }
+
+    .track-btn:hover {
+      border-color: var(--tamu-maroon);
+      background: #ffffff;
+      color: var(--tamu-maroon);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    /* Modal Layout */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(30, 41, 59, 0.75);
+      backdrop-filter: blur(3px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--tamu-card-bg);
+      width: 100%;
+      max-width: 950px;
+      max-height: 90vh;
+      border-radius: 8px;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+      position: relative;
+      border: 1px solid var(--tamu-border);
+    }
+
+    .modal-header {
+      background: var(--tamu-maroon);
+      color: #ffffff;
+      padding: 24px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 3px solid var(--tamu-slate);
+    }
+
+    .modal-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #ffffff;
+    }
+
+    .modal-header p {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      color: #ffffff;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: transparent;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-body {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .exemplar-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid var(--tamu-border-light);
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .ex-tab-btn {
+      padding: 8px 16px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border: 1px solid var(--tamu-border);
+      border-radius: 4px;
+      background: var(--tamu-bg);
+      cursor: pointer;
+      color: var(--tamu-steel);
+    }
+
+    .ex-tab-btn.active {
+      background: var(--tamu-maroon);
+      color: #ffffff;
+      border-color: var(--tamu-maroon);
+    }
+
+    .package-card {
+      border: 1px solid var(--tamu-border);
+      border-radius: 6px;
+      padding: 20px;
+      background: var(--tamu-cell-bg);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .discipline-label {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--tamu-maroon);
+    }
+
+    .data-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .data-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--tamu-maroon);
+    }
+
+    .data-body {
+      font-size: 0.88rem;
+      color: var(--tamu-slate);
+      line-height: 1.55;
+    }
+
+    .ulo-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .ulo-badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: var(--ulo-badge-bg);
+      color: var(--ulo-badge-text);
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid #bae6fd;
+    }
+
+    /* Builder & Diagnostic Panel Styling */
+    .builder-panel {
+      background: var(--tamu-card-bg);
+      border: 1px solid var(--tamu-border);
+      border-radius: 8px;
+      padding: 28px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    .panel-header {
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--tamu-border-light);
+      padding-bottom: 16px;
+    }
+
+    .panel-header h2 {
+      font-size: 1.25rem;
+      color: var(--tamu-maroon);
+      margin-bottom: 6px;
+    }
+
+    .panel-header p {
+      font-size: 0.88rem;
+      color: var(--tamu-steel);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--tamu-slate);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--tamu-border);
+      border-radius: 4px;
+      font-size: 0.88rem;
+      color: var(--tamu-slate);
+      background: #ffffff;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .output-box {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid var(--tamu-border);
+      border-radius: 6px;
+      padding: 24px;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      line-height: 1.6;
+      margin-top: 16px;
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      border: 1px solid var(--tamu-border);
+      color: var(--tamu-slate);
+      padding: 10px 18px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      background: var(--tamu-border-light);
+    }
+
+    .drawer-transition { transition: transform 0.3s ease-in-out; }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+<body>
 
-  <!-- Header -->
-  <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 shadow-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row justify-between items-center gap-4">
-      <div>
-        <h1 class="text-xl font-bold flex items-center gap-2">
-          <i class="fa-solid fa-graduation-cap text-indigo-400"></i>
-          TAMU High-Impact Practices (HIPs) Master Suite
-        </h1>
-        <p class="text-xs text-slate-400 mt-0.5">AAC&U Quality Elements, Texas A&M ULO Alignment & AI Scaffolding Engine</p>
+  <div id="indexToolContainer">
+    <div class="container">
+      <header class="main-header">
+        <h1>TAMU High-Impact Practices (HIPs) Course Profile Tool</h1>
+        <p>Center for Teaching Excellence | All 4 Quadrants, 8 AAC&U Quality Elements & TAMU ULO Mapping</p>
+      </header>
+
+      <section class="rationale-section">
+        <h2>Tool Purpose & Institutional Rationale</h2>
+        <p>
+          The TAMU High-Impact Practices (HIPs) Course Profile Tool provides a comprehensive framework across all four core pedagogical quadrants to design, evaluate, and scale high-impact learning experiences. By systematically aligning course activities with AAC&U quality elements and Texas A&M's 7 Undergraduate Learning Outcomes (ULOs), this tool ensures rigorous curriculum design, institutional fidelity, and verifiable student success.
+        </p>
+      </section>
+
+      <!-- FLATTENED SINGLE-LEVEL TOP TAB BAR -->
+      <nav class="tool-nav">
+        <button class="nav-tab active" onclick="switchMainTab('matrixTab')">Interactive HIP Matrix</button>
+        <button class="nav-tab" onclick="switchMainTab('diagnosticTab')">Course Self-Diagnostic & Radar</button>
+        <button class="nav-tab" onclick="switchMainTab('builderTab')">Syllabus Language Builder</button>
+      </nav>
+
+      <!-- TAB 1: INTERACTIVE MATRIX TOOL -->
+      <div id="matrixTab" class="tab-content active">
+        <div class="matrix-wrapper">
+          <div class="matrix-grid" id="matrixContainer"></div>
+        </div>
       </div>
-      <div class="flex items-center gap-3">
-        <button id="resetBtn" class="px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-md transition flex items-center gap-1.5 border border-slate-700">
-          <i class="fa-solid fa-rotate-left"></i> Reset Diagnostic
-        </button>
-        <button onclick="window.print()" class="px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-md transition flex items-center gap-1.5 shadow-sm">
-          <i class="fa-solid fa-print"></i> Export / Print Full Suite
-        </button>
-      </div>
-    </div>
 
-    <!-- Main Navigation Bar -->
-    <nav class="bg-slate-950 border-t border-slate-800/60 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-7xl mx-auto flex gap-6 text-xs sm:text-sm font-medium">
-        <button onclick="switchTab('radar')" id="tabNav-radar" class="py-2.5 px-1 text-slate-400 hover:text-white transition tab-active flex items-center gap-2">
-          <i class="fa-solid fa-chart-pie"></i> Diagnostic Radar & AI Scaffolding
-        </button>
-        <button onclick="switchTab('matrix')" id="tabNav-matrix" class="py-2.5 px-1 text-slate-400 hover:text-white transition flex items-center gap-2">
-          <i class="fa-solid fa-table-cells"></i> Fidelity Matrix & Disciplinary Exemplars
-        </button>
-        <button onclick="switchTab('syllabus')" id="tabNav-syllabus" class="py-2.5 px-1 text-slate-400 hover:text-white transition flex items-center gap-2">
-          <i class="fa-solid fa-file-pen"></i> Syllabus & AI Prompt Builder
-        </button>
-      </div>
-    </nav>
-  </header>
-
-  <!-- Main Content View Container -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
-
-    <!-- ========================================== -->
-    <!-- TAB 1: DIAGNOSTIC RADAR MAP & AI SCAFFOLDING -->
-    <!-- ========================================== -->
-    <div id="tabView-radar" class="tab-content grid grid-cols-1 lg:grid-cols-12 gap-8">
-      
-      <!-- Left Column: Diagnostic Matrix Form (7 cols) -->
-      <section class="lg:col-span-7 space-y-6">
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-          <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+      <!-- TAB 2: COURSE SELF-DIAGNOSTIC & RADAR (SWAPPED WITH SECOND SNIPPET) -->
+      <div id="diagnosticTab" class="tab-content">
+        <header class="bg-slate-900 text-white border-b border-slate-800 rounded-lg sticky top-0 z-20 shadow-md mb-6">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h2 class="text-lg font-bold text-slate-900">1. Course Assessment Matrix</h2>
-              <p class="text-xs text-slate-500">Select current implementation level for each dimension. Changes automatically sync across all suite modules.</p>
+              <div class="flex items-center gap-2">
+                <span class="bg-red-900 text-white text-xs font-bold px-2 py-0.5 rounded border border-red-700">TAMU HIPs</span>
+                <h1 class="text-xl font-bold tracking-tight text-white m-0">Course Fidelity & Pedagogical Tool</h1>
+              </div>
+              <p class="text-xs text-slate-400 mt-1 mb-0">Based on the AAC&U 8 Quality Elements & Institutional Rationale Matrix</p>
             </div>
-            <span class="text-xs font-semibold px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full border border-indigo-100" id="completionBadge">8/8 Completed</span>
-          </div>
-
-          <!-- 8 Dimensions Selection List -->
-          <div id="dimensionsList" class="space-y-4">
-            <!-- Dynamically populated by JS -->
-          </div>
-        </div>
-      </section>
-
-      <!-- Right Column: Visual Dashboard & Analytics (5 cols) -->
-      <section class="lg:col-span-5 space-y-6 lg:sticky lg:top-28 self-start">
-        
-        <!-- Radar Chart Card -->
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-base font-bold text-slate-900">2. HIPs Profile Map</h2>
-            <span class="text-xs text-slate-400">Click points/labels to inspect AI Prompts</span>
-          </div>
-          <div class="relative w-full aspect-square max-w-sm mx-auto">
-            <canvas id="hipsRadarChart"></canvas>
-          </div>
-        </div>
-
-        <!-- Diagnostic Summary Metrics -->
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">TAMU Implementation Index</h3>
-          <div class="flex justify-between items-center">
-            <span class="text-sm font-semibold text-slate-700">Total Score:</span>
-            <span class="text-lg font-extrabold text-indigo-600" id="totalScoreText">8 / 24</span>
-          </div>
-          <div class="w-full bg-slate-100 rounded-full h-2">
-            <div id="scoreProgressBar" class="bg-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 33%"></div>
-          </div>
-          <div class="pt-2 text-xs text-slate-600 flex justify-between items-center border-t border-slate-100">
-            <span>Overall Status Level:</span>
-            <span id="overallLevelBadge" class="font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">Foundational HIP</span>
-          </div>
-        </div>
-
-        <!-- Quick Guidance Banner -->
-        <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white p-5 rounded-xl shadow-sm border border-slate-800 relative overflow-hidden">
-          <div class="relative z-10 space-y-2">
-            <div class="flex items-center gap-2 text-indigo-300 font-semibold text-sm">
-              <i class="fa-solid fa-wand-magic-sparkles"></i> AI Scaffolding Engine
+            
+            <!-- Target Score Banner -->
+            <div id="scoreSummaryBanner" class="bg-slate-800 border border-slate-700 rounded-lg p-3 flex items-center gap-4 w-full sm:w-auto justify-between">
+              <div>
+                <div class="text-xs text-slate-400 font-medium">Total Score</div>
+                <div class="text-2xl font-black text-white" id="totalScoreText">0 <span class="text-xs font-normal text-slate-400">/ 24</span></div>
+              </div>
+              <div class="h-8 w-px bg-slate-700"></div>
+              <div class="text-right">
+                <div class="text-xs text-slate-400 font-medium">Scope & Governance Tier</div>
+                <div id="scopeBadge" class="text-xs font-bold px-2 py-1 rounded bg-slate-700 text-slate-300 mt-0.5 inline-block">
+                  Below Threshold (&lt; 8 pts)
+                </div>
+              </div>
             </div>
-            <p class="text-xs text-slate-300 leading-relaxed">
-              Click any dimension card or point on the radar map to launch the <strong>Action & AI Scaffolding Drawer</strong> for prompts, rubrics, and activity generators tailored to your course.
-            </p>
+          </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left Column: 4 Quadrants & Elements Form (7 cols) -->
+            <div class="lg:col-span-7 space-y-6">
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2 m-0">
+                  <i data-lucide="layers" class="w-5 h-5 text-slate-600"></i>
+                  4 Quality Quadrants
+                </h2>
+                <button onclick="resetScores()" class="text-xs font-medium text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors cursor-pointer bg-transparent border-0">
+                  <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset All
+                </button>
+              </div>
+
+              <div id="quadrantsContainer" class="space-y-6">
+                <!-- Quadrants rendered dynamically via JS -->
+              </div>
+            </div>
+
+            <!-- Right Column: Radar Chart & Tier Guide (5 cols) -->
+            <div class="lg:col-span-5 space-y-6">
+              
+              <!-- Radar Chart Card -->
+              <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 sticky top-24">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="font-bold text-slate-900 flex items-center gap-2 m-0">
+                    <i data-lucide="radar" class="w-4 h-4 text-indigo-600"></i>
+                    Fidelity Profile Visualization
+                  </h3>
+                  <span class="text-xs font-medium text-slate-400">8 Quality Dimensions</span>
+                </div>
+
+                <div class="relative aspect-square w-full">
+                  <canvas id="hipsRadarChart"></canvas>
+                </div>
+
+                <!-- Quadrant Legend -->
+                <div class="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-100 text-xs">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                    <span class="text-slate-600 font-medium">A: Engagement</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                    <span class="text-slate-600 font-medium">B: Challenge & Rigor</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    <span class="text-slate-600 font-medium">C: Integration</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
+                    <span class="text-slate-600 font-medium">D: Impact</span>
+                  </div>
+                </div>
+
+                <!-- Scope Threshold Reference -->
+                <div class="mt-6 bg-slate-50 rounded-lg p-3 border border-slate-200 text-xs space-y-2">
+                  <div class="font-semibold text-slate-800">Target Score Benchmarks:</div>
+                  <div class="flex justify-between items-center text-slate-600">
+                    <span>8 – 13 Points:</span>
+                    <span class="font-medium text-slate-900">Scope 1 (Internal / Instructor Safety Net)</span>
+                  </div>
+                  <div class="flex justify-between items-center text-slate-600">
+                    <span>14 – 19 Points:</span>
+                    <span class="font-medium text-slate-900">Scope 2 (Campus/Community / Partner Agreement)</span>
+                  </div>
+                  <div class="flex justify-between items-center text-slate-600">
+                    <span>20 – 24 Points:</span>
+                    <span class="font-medium text-slate-900">Scope 3 (External / Institutional Protocol)</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </main>
+      </div>
+
+      <!-- TAB 3: SYLLABUS LANGUAGE BUILDER -->
+      <div id="builderTab" class="tab-content">
+        <div class="builder-panel">
+          <div class="panel-header">
+            <h2>Syllabus Language Builder</h2>
+            <p>Generate comprehensive, copy-paste syllabus descriptions, learning outcomes, assessment frameworks, and explicit TAMU ULO mappings for any element.</p>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="builderElement">AAC&U Quality Element</label>
+              <select id="builderElement" class="form-control" onchange="updateBuilderExemplars()"></select>
+            </div>
+            <div class="form-group">
+              <label for="builderScope">Developmental Level</label>
+              <select id="builderScope" class="form-control" onchange="updateBuilderExemplars()">
+                <option value="foundational">Foundational</option>
+                <option value="applied">Applied</option>
+                <option value="integrated">Integrated</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="builderTrack">Track Focus</label>
+              <select id="builderTrack" class="form-control" onchange="updateBuilderExemplars()">
+                <option value="stem">STEM Track</option>
+                <option value="nonstem">Non-STEM Track (Includes Business)</option>
+                <option value="cocurricular">Co-Curricular Track</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="builderExemplarIdx">Select Specific Disciplinary Example</label>
+            <select id="builderExemplarIdx" class="form-control" onchange="generateSyllabusText()"></select>
+          </div>
+
+          <label style="font-size: 0.82rem; font-weight: 700; color: var(--tamu-slate); text-transform: uppercase;">Generated Syllabus Text (Ready for Paste)</label>
+          <div class="output-box" id="syllabusOutput">Select options above to generate language.</div>
+          <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+            <button class="btn-secondary" onclick="copySyllabusText()">Copy Syllabus Language to Clipboard</button>
           </div>
         </div>
-      </section>
+      </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- TAB 2: TAMU FIDELITY MATRIX & EXEMPLARS     -->
-    <!-- ========================================== -->
-    <div id="tabView-matrix" class="tab-content hidden space-y-8">
-      
-      <!-- Track Selector Header -->
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <!-- MODAL DIALOG -->
+    <div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close-btn" onclick="closeModal()">X</button>
+          <h2 id="modalTitle">Element Title</h2>
+          <p id="modalSubtitle">Quadrant & Scope</p>
+        </div>
+        <div class="modal-body">
+          <div class="exemplar-tabs" id="modalExemplarTabs"></div>
+          <div id="modalExemplarContent"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIAGNOSTIC SIDE DRAWER (FROM SNIPPET 2) -->
+    <div id="drawerBackdrop" onclick="closeDrawer()" class="fixed inset-0 bg-slate-900/40 opacity-0 pointer-events-none transition-opacity duration-300 z-30"></div>
+
+    <aside id="sideDrawer" class="fixed top-0 right-0 h-full w-full max-w-lg bg-white shadow-2xl z-40 transform translate-x-full drawer-transition flex flex-col border-l border-slate-200">
+      <!-- Drawer Header -->
+      <div class="p-6 border-b border-slate-200 bg-slate-900 text-white flex items-start justify-between">
         <div>
-          <h2 class="text-lg font-bold text-slate-900">Texas A&M High-Impact Practice (HIP) Quality Matrix</h2>
-          <p class="text-xs text-slate-500 mt-1">Structured framework mapping the 8 AAC&U Quality Elements to TAMU Undergraduate Learning Outcomes (ULOs).</p>
+          <span id="drawerQuadrantBadge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+            Quadrant
+          </span>
+          <h2 id="drawerTitle" class="text-xl font-bold mt-2 text-white">Element Title</h2>
         </div>
-        <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-lg border border-slate-200">
-          <span class="text-xs font-semibold text-slate-600 px-2">Discipline Track:</span>
-          <button onclick="setTrack('stem')" id="trackBtn-stem" class="px-3 py-1 text-xs font-semibold rounded-md transition bg-white text-indigo-600 shadow-sm">STEM</button>
-          <button onclick="setTrack('non-stem')" id="trackBtn-non-stem" class="px-3 py-1 text-xs font-semibold rounded-md transition text-slate-600 hover:text-slate-900">Non-STEM / Business</button>
-          <button onclick="setTrack('co-curricular')" id="trackBtn-co-curricular" class="px-3 py-1 text-xs font-semibold rounded-md transition text-slate-600 hover:text-slate-900">Co-Curricular</button>
-        </div>
-      </div>
-
-      <!-- 4 Quadrants Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        <!-- Quadrant A -->
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
-            <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs">A</span>
-            <h3 class="font-bold text-slate-900 text-sm">Quadrant A: Engagement & Mentorship</h3>
-          </div>
-          <div id="quadrantA-container" class="space-y-4"></div>
-        </div>
-
-        <!-- Quadrant B -->
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
-            <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs">B</span>
-            <h3 class="font-bold text-slate-900 text-sm">Quadrant B: Challenge & Rigor</h3>
-          </div>
-          <div id="quadrantB-container" class="space-y-4"></div>
-        </div>
-
-        <!-- Quadrant C -->
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
-            <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs">C</span>
-            <h3 class="font-bold text-slate-900 text-sm">Quadrant C: Relevance & Application</h3>
-          </div>
-          <div id="quadrantC-container" class="space-y-4"></div>
-        </div>
-
-        <!-- Quadrant D -->
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
-            <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs">D</span>
-            <h3 class="font-bold text-slate-900 text-sm">Quadrant D: Integration & Reflection</h3>
-          </div>
-          <div id="quadrantD-container" class="space-y-4"></div>
-        </div>
-      </div>
-
-      <!-- TAMU ULO Alignment Aggregator -->
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
-        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-          <i class="fa-solid fa-award text-amber-500"></i> Active Texas A&M Undergraduate Learning Outcome (ULO) Coverage
-        </h3>
-        <p class="text-xs text-slate-500">Aggregated automatically from active quality element developmental levels.</p>
-        <div id="uloCoverageBadges" class="flex flex-wrap gap-2">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- TAB 3: SYLLABUS & AI PROMPT BUILDER        -->
-    <!-- ========================================== -->
-    <div id="tabView-syllabus" class="tab-content hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
-      
-      <!-- Controls Panel (5 cols) -->
-      <div class="lg:col-span-5 space-y-6">
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-5">
-          <div>
-            <h2 class="text-base font-bold text-slate-900">Syllabus & AI Generator Controls</h2>
-            <p class="text-xs text-slate-500 mt-0.5">Customize options to generate turnkey syllabus language and explicit LLM prompts.</p>
-          </div>
-
-          <!-- Quality Element Selection -->
-          <div class="space-y-1.5">
-            <label class="text-xs font-bold text-slate-700 uppercase tracking-wider">1. AAC&U Quality Element</label>
-            <select id="builderElementSelect" onchange="generateSyllabusOutput()" class="w-full p-2.5 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-              <!-- Dynamically populated -->
-            </select>
-          </div>
-
-          <!-- Level Selection -->
-          <div class="space-y-1.5">
-            <label class="text-xs font-bold text-slate-700 uppercase tracking-wider">2. Developmental Level</label>
-            <select id="builderLevelSelect" onchange="generateSyllabusOutput()" class="w-full p-2.5 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-              <option value="1">Level 1: Foundational</option>
-              <option value="2">Level 2: Applied / Developing</option>
-              <option value="3">Level 3: Integrated / Advanced</option>
-            </select>
-          </div>
-
-          <!-- Track Selection -->
-          <div class="space-y-1.5">
-            <label class="text-xs font-bold text-slate-700 uppercase tracking-wider">3. Disciplinary Perspective</label>
-            <select id="builderTrackSelect" onchange="generateSyllabusOutput()" class="w-full p-2.5 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-              <option value="stem">STEM Track</option>
-              <option value="non-stem">Non-STEM / Business Track</option>
-              <option value="co-curricular">Co-Curricular / Experiential Track</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- Output Panel (7 cols) -->
-      <div class="lg:col-span-7 space-y-6">
-        
-        <!-- Syllabus Output Box -->
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
-          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
-            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <i class="fa-solid fa-file-contract text-indigo-600"></i> Formatted Syllabus Section
-            </h3>
-            <button id="copySyllabusBtn" class="px-3 py-1.5 text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-md transition flex items-center gap-1.5">
-              <i class="fa-regular fa-copy"></i> Copy Syllabus Section
-            </button>
-          </div>
-          
-          <div id="syllabusOutputText" class="p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs font-sans text-slate-800 leading-relaxed whitespace-pre-wrap">
-            <!-- Injected by JS -->
-          </div>
-        </div>
-
-        <!-- AI Scaffolding Prompt Box -->
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
-          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
-            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <i class="fa-solid fa-robot text-indigo-600"></i> Associated AI Implementation Prompt
-            </h3>
-            <button id="copySyllabusPromptBtn" class="px-3 py-1.5 text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-md transition flex items-center gap-1.5">
-              <i class="fa-regular fa-copy"></i> Copy AI Prompt
-            </button>
-          </div>
-          
-          <pre id="syllabusPromptOutputText" class="p-4 bg-slate-900 text-indigo-200 text-xs font-mono rounded-lg overflow-x-auto whitespace-pre-wrap leading-relaxed border border-slate-800 select-all">
-            <!-- Injected by JS -->
-          </pre>
-        </div>
-
-      </div>
-    </div>
-
-  </main>
-
-  <!-- ========================================== -->
-  <!-- ACTION DRAWER (SIDE SLIDE-OUT PANEL)       -->
-  <!-- ========================================== -->
-  <div id="drawerBackdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300"></div>
-  
-  <aside id="actionDrawer" class="fixed top-0 right-0 h-full w-full max-w-xl bg-white z-50 shadow-2xl drawer-transform translate-x-full flex flex-col border-l border-slate-200">
-    
-    <!-- Drawer Header -->
-    <div class="p-6 bg-slate-900 text-white flex justify-between items-start shrink-0">
-      <div class="space-y-1">
-        <span id="drawerDimCategory" class="text-xs font-semibold uppercase tracking-wider text-indigo-400">Dimension 1</span>
-        <h3 id="drawerDimTitle" class="text-xl font-bold text-white">High Performance Expectations</h3>
-        <div id="drawerLevelBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700 mt-2">
-          <!-- Injected by JS -->
-        </div>
-      </div>
-      <button id="closeDrawerBtn" class="text-slate-400 hover:text-white p-1 rounded-lg transition">
-        <i class="fa-solid fa-xmark text-xl"></i>
-      </button>
-    </div>
-
-    <!-- Drawer Content (Scrollable 4-Part Structure) -->
-    <div class="p-6 overflow-y-auto flex-1 space-y-6 scrollbar-thin">
-      
-      <!-- 1. Level Status -->
-      <div class="space-y-2">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-          <span class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-semibold">1</span>
-          Level Status
-        </h4>
-        <div id="drawerStatusText" class="p-3.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold text-slate-800">
-          <!-- Injected by JS -->
-        </div>
-      </div>
-
-      <!-- 2. Descriptor -->
-      <div class="space-y-2">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-          <span class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-semibold">2</span>
-          Current Descriptor & Indicators
-        </h4>
-        <p id="drawerDescriptor" class="text-sm text-slate-600 leading-relaxed p-4 bg-slate-50 border border-slate-100 rounded-lg">
-          <!-- Injected by JS -->
-        </p>
-      </div>
-
-      <!-- 3. Actionable Recommendation -->
-      <div class="space-y-2">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-          <span class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-semibold">3</span>
-          Actionable Growth Recommendation
-        </h4>
-        <div id="drawerRecommendation" class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-lg text-sm leading-relaxed">
-          <!-- Injected by JS -->
-        </div>
-      </div>
-
-      <!-- 4. High-Quality AI Scaffolding Prompt -->
-      <div class="space-y-3 pt-2">
-        <div class="flex justify-between items-center">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-semibold">4</span>
-            High-Quality AI Implementation Prompt
-          </h4>
-          <button id="copyPromptBtn" class="px-2.5 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded transition flex items-center gap-1.5">
-            <i class="fa-regular fa-copy"></i> Copy Prompt
-          </button>
-        </div>
-        
-        <div class="relative">
-          <pre id="drawerAiPrompt" class="p-4 bg-slate-900 text-indigo-200 text-xs font-mono rounded-lg overflow-x-auto whitespace-pre-wrap leading-relaxed border border-slate-800 select-all"></pre>
-        </div>
-        <p class="text-[11px] text-slate-400 italic">
-          <i class="fa-solid fa-circle-info mr-1"></i> Replace bracketed text before submitting into ChatGPT, Claude, or Copilot.
-        </p>
-      </div>
-
-    </div>
-
-    <!-- Drawer Footer -->
-    <div class="p-4 bg-slate-50 border-t border-slate-200 shrink-0 flex justify-end">
-      <button id="drawerCloseFooterBtn" class="px-4 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition">
-        Done Inspecting
-      </button>
-    </div>
-  </aside>
-
-  <!-- ========================================== -->
-  <!-- DISCIPLINARY EXEMPLAR MODAL                -->
-  <!-- ========================================== -->
-  <div id="exemplarModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-200 flex flex-col">
-      <div class="p-5 bg-slate-900 text-white flex justify-between items-center sticky top-0 z-10">
-        <div>
-          <span id="modalElementBadge" class="text-[10px] font-bold uppercase tracking-wider text-indigo-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Element Exemplar</span>
-          <h3 id="modalTitle" class="text-base font-bold text-white mt-1">Disciplinary Exemplar</h3>
-        </div>
-        <button onclick="closeExemplarModal()" class="text-slate-400 hover:text-white p-1 transition">
-          <i class="fa-solid fa-xmark text-lg"></i>
+        <button onclick="closeDrawer()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors bg-transparent border-0 cursor-pointer">
+          <i data-lucide="x" class="w-6 h-6"></i>
         </button>
       </div>
-      <div id="modalBody" class="p-6 space-y-4 text-xs text-slate-700">
-        <!-- Injected by JS -->
+
+      <!-- Drawer Content Scrollable -->
+      <div class="flex-1 overflow-y-auto p-6 space-y-6">
+        
+        <!-- Institutional Rationale Callout -->
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+          <div class="flex items-center gap-2 text-amber-900 font-semibold text-sm mb-1">
+            <i data-lucide="compass" class="w-4 h-4 text-amber-700"></i>
+            Institutional Rationale
+          </div>
+          <p id="drawerRationale" class="text-xs text-amber-800 leading-relaxed m-0">
+            Rationale text goes here...
+          </p>
+        </div>
+
+        <!-- Active Level Selector in Drawer -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Select Active Level</label>
+          <div class="grid grid-cols-3 gap-2" id="drawerLevelSelector">
+            <!-- Buttons rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Exact Level Descriptor -->
+        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-700 uppercase tracking-wide">Fidelity Matrix Descriptor</span>
+            <span id="drawerLevelBadge" class="text-xs font-bold px-2 py-0.5 rounded bg-indigo-100 text-indigo-800">
+              Level 1
+            </span>
+          </div>
+          <p id="drawerDescriptor" class="text-sm text-slate-800 font-medium leading-relaxed m-0">
+            Descriptor text...
+          </p>
+        </div>
+
+        <!-- Suggested Instructional Ideas -->
+        <div>
+          <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2 mb-3 mt-0">
+            <i data-lucide="lightbulb" class="w-4 h-4 text-amber-500"></i>
+            Suggested Instructional Ideas & Approaches
+          </h3>
+          <ul id="drawerApproaches" class="space-y-2.5 text-xs text-slate-700 p-0 m-0 list-none">
+            <!-- Bullet points rendered via JS -->
+          </ul>
+        </div>
+
       </div>
-      <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
-        <button onclick="closeExemplarModal()" class="px-4 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition">
-          Close Modal
+
+      <!-- Drawer Footer -->
+      <div class="p-4 border-t border-slate-200 bg-slate-50 flex justify-end">
+        <button onclick="closeDrawer()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition-colors border-0 cursor-pointer">
+          Done & Close
         </button>
       </div>
-    </div>
+    </aside>
   </div>
 
-  <!-- Notification Toast -->
-  <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-3 rounded-lg shadow-xl text-xs font-medium flex items-center gap-2 z-50 transform translate-y-10 opacity-0 transition-all duration-300 pointer-events-none">
-    <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-    <span id="toastMsg">Action completed successfully!</span>
-  </div>
-
-  <!-- Application Architecture & Master JS Script -->
+  <!-- JAVASCRIPT ARCHITECTURE -->
   <script>
-    // Master Unified 8-Dimension Data Engine (Option A: Levels 1-3)
-    const dimensionsData = [
+    const TAMU_ULOS = {
+      ulo_depth: "1. Master Depth of Knowledge",
+      ulo_critical: "2. Demonstrate Critical Thinking",
+      ulo_comm: "3. Communicate Effectively",
+      ulo_resp: "4. Practice Personal & Social Responsibility",
+      ulo_global: "5. Demonstrate Social, Cultural & Global Competence",
+      ulo_lifelong: "6. Prepare to Engage in Lifelong Learning",
+      ulo_collab: "7. Work Collaboratively"
+    };
+
+    const matrixData = [
       {
-        id: 1,
-        quadrant: 'B',
-        name: "High Performance Expectations",
-        shortName: "High Expectations",
-        tamuUlo: [1, 2], // 1: Master Depth, 2: Critical Thinking
-        tiers: {
-          1: {
-            title: "Foundational (Level 1)",
-            descriptor: "Learning goals emphasize lower-level Bloom’s taxonomy tasks (recall, comprehension). High expectations are stated in syllabus but lack explicit scaffolding.",
-            recommendation: "Elevate learning outcomes from passive recall to analytical evaluation by introducing explicit criteria and high-challenge practice.",
-            aiPrompt: `Act as a University Instructional Designer specializing in High-Impact Practices (HIPs). I teach [Insert Course Name] for [Insert Student Level/Major]. \n\nCurrently, my main course assignment requires students to [Insert Current Assignment, e.g., summarize textbook chapters]. I want to raise the intellectual challenge of this task to target higher-order thinking (Analysis/Evaluation) without overwhelming students or dramatically increasing my grading burden.\n\nPlease generate:\n1. Three revised options for this assignment that require students to analyze, compare, or evaluate real scenarios in [Insert Discipline].\n2. A clear, 3-level performance rubric scale (Exceeds Expectations, Meets Expectations, Developing) outlining what high performance looks like.\n3. A brief 100-word syllabus callout explaining the higher expectations and how students will be supported to meet them.`,
-            exemplars: {
-              stem: { slo: "Recall fundamental chemical equations and balance basic reactions.", activity: "Weekly drill sheets with clear answer keys.", deliverable: "Individual problem sets.", ulos: [1] },
-              nonStem: { slo: "Summarize key market structures and supply/demand principles.", activity: "Textbook summary assignments and textbook quizzes.", deliverable: "Chapter summary reports.", ulos: [1] },
-              coCurricular: { slo: "Identify basic organizational roles and student leader responsibilities.", activity: "Attend introductory orientation sessions.", deliverable: "Attendance log.", ulos: [1] }
+        quadrant: "QUADRANT A: ENGAGEMENT & MENTORSHIP",
+        elements: [
+          {
+            id: "interactions",
+            title: "1. Faculty & Peer Interactions",
+            rationale: "Mentorship density directly correlates with student retention, sense of belonging, and post-graduation mobility.",
+            tiers: {
+              foundational: {
+                desc: "Faculty-led modeling with structured peer-review protocols focused on establishing clear foundational criteria.",
+                exemplars: {
+                  stem: [
+                    { discipline: "Biology (Introductory Genetics)", outcome: "Apply standardized peer-review protocols to evaluate classmate laboratory calculation workflows and hypothesis structures.", activity: "Peer-Led Team Learning (PLTL) weekly workshops where students cross-verify lab procedures and error calculations using structured peer review sheets.", assessment: "Peer Verification Checklist evaluated for diagnostic accuracy and feedback depth.", ulos: ["ulo_depth", "ulo_collab", "ulo_critical"] },
+                    { discipline: "Chemistry (Organic Lab)", outcome: "Critique peer synthetic reaction mechanism diagrams using instructor-modeled assessment criteria.", activity: "Structured bench-side peer audits of reaction notebook steps prior to lab execution.", assessment: "Annotated Synthetic Mechanism Protocol and Instructor Verification Signoff.", ulos: ["ulo_depth", "ulo_critical"] },
+                    { discipline: "Computer Science (Programming Fundamentals)", outcome: "Identify structural syntax errors and logical edge cases in peer code submissions.", activity: "Paired code review sprints adhering to industry-standard peer debugging checklists.", assessment: "Code Review Log detailing identified bugs and proposed optimizations.", ulos: ["ulo_critical", "ulo_collab"] }
+                  ],
+                  nonstem: [
+                    { discipline: "History (US History Survey)", outcome: "Analyze peer thesis statements using instructor-modeled rubrics for primary source evidentiary support.", activity: "Structured peer review workshop evaluating essay introductions against formal historiographical rubrics.", assessment: "Annotated Peer Draft Review Rubric with actionable revision notes.", ulos: ["ulo_critical", "ulo_comm"] },
+                    { discipline: "Business (Intro to Marketing)", outcome: "Evaluate peer target market profile briefs using standardized consumer behavior criteria.", activity: "Small-group market segmentation peer critique using instructor-provided analytical grids.", assessment: "Peer Feedback Grid with revised customer persona submission.", ulos: ["ulo_depth", "ulo_collab"] },
+                    { discipline: "English (Composition & Rhetoric)", outcome: "Construct constructive critique regarding peer rhetorical strategies and paragraph cohesion.", activity: "Triad writing workshop conducting line-by-line peer reviews on persuasive drafts.", assessment: "Peer Critique Sheet and Draft 2 Revision Matrix.", ulos: ["ulo_comm", "ulo_critical"] }
+                  ],
+                  cocurricular: [
+                    { discipline: "Student Leadership (Emerging Leaders)", outcome: "Execute structured team peer-evaluations following established organizational communication norms.", activity: "Team charter orientation drafting ground rules and practicing introductory peer feedback scenarios.", assessment: "Completed Peer Feedback Worksheet and signed Team Operating Agreement.", ulos: ["ulo_collab", "ulo_resp"] },
+                    { discipline: "Campus Engagement (Peer Mentorship)", outcome: "Demonstrate active listening techniques during peer-to-peer mentoring onboarding sessions.", activity: "Role-play mentoring scenarios with faculty advisors evaluating communication dynamics.", assessment: "Active Listening Self-Assessment & Advisor Evaluation Rubric.", ulos: ["ulo_comm", "ulo_collab"] },
+                    { discipline: "Residential Life (Hall Councils)", outcome: "Formulate group consensus protocols for hall event budgeting discussions.", activity: "Guided committee breakout sessions practicing collaborative resource distribution.", assessment: "Committee Decision Log & Peer Collaboration Rating.", ulos: ["ulo_collab", "ulo_resp"] }
+                  ]
+                }
+              },
+              applied: {
+                desc: "Iterative collaboration where peers provide formative critique and faculty operates as an expert consultant.",
+                exemplars: {
+                  stem: [{ discipline: "Civil Engineering (Hydrology)", outcome: "Refine stormwater drainage prototypes through formative critique sessions with faculty acting as engineering consultants.", activity: "Weekly studio pin-up sessions presenting hydraulic modeling data to faculty and peer design teams.", assessment: "Design Iteration Log documenting how peer and instructor critique altered engineering drafts.", ulos: ["ulo_depth", "ulo_critical", "ulo_collab"] }],
+                  nonstem: [{ discipline: "Sociology (Research Methods)", outcome: "Co-design community survey instruments through iterative peer feedback and instructor consultations.", activity: "Collaborative workshop revising survey items based on pilot test feedback from campus focus groups.", assessment: "Survey Methodology Proposal accompanied by a Peer Revision Matrix.", ulos: ["ulo_critical", "ulo_global", "ulo_comm"] }],
+                  cocurricular: [{ discipline: "Student Engagement (Program Board)", outcome: "Execute multi-stage campus event planning with advisors acting as strategic quality consultants.", activity: "Bi-weekly sprint review meetings where student managers present event metrics to advisors.", assessment: "Mid-Project Progress Memo with peer 360-degree performance evaluation summaries.", ulos: ["ulo_collab", "ulo_resp", "ulo_lifelong"] }]
+                }
+              },
+              integrated: {
+                desc: "Sustained professional partnership where students, faculty, and external partners co-author or co-design products.",
+                exemplars: {
+                  stem: [{ discipline: "Biomedical Engineering (Capstone)", outcome: "Co-author original biomedical engineering design specifications in direct partnership with clinical sponsors.", activity: "Year-long collaborative laboratory research sprints co-investigating novel medical device deployment.", assessment: "Co-Authored Technical Design Manuscript & External Sponsor Defense Signoff.", ulos: ["ulo_depth", "ulo_critical", "ulo_comm", "ulo_collab"] }],
+                  nonstem: [{ discipline: "Public History (Curatorial Practicum)", outcome: "Co-curate a public museum exhibit in direct partnership with municipal archive directors.", activity: "On-site archival curation, exhibit text drafting, and layout design with professional museum curators.", assessment: "Public Museum Exhibit Deliverable & Partner Co-Design Evaluation.", ulos: ["ulo_depth", "ulo_comm", "ulo_global", "ulo_collab"] }],
+                  cocurricular: [{ discipline: "Student Governance (SGA Cabinet)", outcome: "Co-create long-term institutional policy recommendations alongside university administrators.", activity: "Joint task force participation drafting campus-wide wellness and safety policies.", assessment: "Signed Institutional Policy Proposal & Executive Advisory Board Signoff.", ulos: ["ulo_resp", "ulo_comm", "ulo_global", "ulo_collab"] }]
+                }
+              }
             }
           },
-          2: {
-            title: "Developing / Applied (Level 2)",
-            descriptor: "Assignments regularly require analysis and application, but criteria for exemplary performance are only partially defined or shared after submission.",
-            recommendation: "Provide exemplar student work models and explicit analytical rubrics prior to submission to make high performance criteria completely transparent.",
-            aiPrompt: `Act as a Higher Education Curriculum Expert. I teach [Insert Course Name]. My students complete [Insert Assignment Name, e.g., a critical analysis paper], but many struggle to reach top-tier analytical rigor.\n\nHelp me design explicit exemplars and scaffolding to clarify high expectations before they submit.\n\nPlease generate:\n1. A rubric checklist distinguishing 'Good' (B-level) work from 'Exemplary' (A-level) work in [Insert Discipline].\n2. A guided exercise where students evaluate a sample paper and annotate how to upgrade it.\n3. Three targeted self-assessment questions students must answer before turning in their final draft.`,
-            exemplars: {
-              stem: { slo: "Apply thermodynamic equations to model chemical systems under variable pressure.", activity: "Guided lab case studies evaluating system failures.", deliverable: "Technical lab calculation report.", ulos: [1, 2] },
-              nonStem: { slo: "Analyze competitive strategy frameworks across multi-national enterprise cases.", activity: "Small-group case analysis workshops.", deliverable: "Comparative business memo.", ulos: [1, 2] },
-              coCurricular: { slo: "Evaluate student organization budget allocations against strategic diversity goals.", activity: "Mid-term budget auditing simulation.", deliverable: "Budget evaluation brief.", ulos: [2, 4] }
-            }
-          },
-          3: {
-            title: "Advanced / Integrated (Level 3)",
-            descriptor: "High performance expectations are co-created or explicitly aligned with professional/disciplinary standards, with continuous scaffolding and authentic stretch goals.",
-            recommendation: "Sustain excellence by involving students in peer mentoring or publishing exemplary outcomes in department repositories or professional venues.",
-            aiPrompt: `Act as a Senior Academic Quality Lead. I teach [Insert Course Name], where students achieve Level 3 High Performance Expectations on [Insert Project Name].\n\nI want to create a framework for students to archive, publish, or present their high-caliber work to external academic or professional audiences.\n\nPlease generate:\n1. A digital portfolio template for students to feature their top-tier course work.\n2. A student reflection guide on translating high-impact course achievements into resume accomplishments.\n3. A brief peer-mentorship protocol for high-performing students to coach future cohorts.`,
-            exemplars: {
-              stem: { slo: "Design and optimize a novel chemical synthesis process adhering to industrial safety and EPA standards.", activity: "Semester capstone project mentored by industry advisors.", deliverable: "Publishable process design document & pitch.", ulos: [1, 2, 6] },
-              nonStem: { slo: "Formulate a comprehensive market entry strategy for a real enterprise facing disruption.", activity: "Live client consulting project with executive milestone defense.", deliverable: "Executive strategy proposal & board pitch.", ulos: [1, 2, 3, 6] },
-              coCurricular: { slo: "Lead a campus-wide sustainability initiative, tracking measurable community impact.", activity: "Student-led grant execution and project direction.", deliverable: "Annual impact defense report & institutional presentation.", ulos: [2, 4, 6] }
+          {
+            id: "feedback",
+            title: "2. Iterative Feedback & Revision",
+            rationale: "Continuous formative assessment catches learning gaps early, significantly reducing drop rates and strengthening mastery.",
+            tiers: {
+              foundational: {
+                desc: "Formative feedback focused on technical accuracy, procedural alignment, and baseline skill acquisition.",
+                exemplars: {
+                  stem: [{ discipline: "Mathematics (Calculus II)", outcome: "Correct mathematical proof logic by incorporating instructor notes on preliminary homework drafts.", activity: "Two-stage submission workflow where Draft 1 receives targeted feedback on proof rigor.", assessment: "Revised Proof Portfolio demonstrating clear diagnostic error correction.", ulos: ["ulo_depth", "ulo_critical"] }],
+                  nonstem: [{ discipline: "English (Technical Writing)", outcome: "Refine document formatting and structural clarity based on low-stakes instructor editorial feedback.", activity: "Writing draft audit modules focusing on technical conciseness.", assessment: "Draft Evolution Portfolio.", ulos: ["ulo_comm", "ulo_critical"] }],
+                  cocurricular: [{ discipline: "Organizational Leadership", outcome: "Identify operational plan errors against standardized student organization management guidelines.", activity: "Auditing committee budgets using structured advisor feedback templates.", assessment: "Corrected Operational Plan.", ulos: ["ulo_resp", "ulo_lifelong"] }]
+                }
+              },
+              applied: {
+                desc: "Feedback emphasizes applying theory to authentic scenarios and demonstrating analytical revision quality.",
+                exemplars: {
+                  stem: [{ discipline: "Computer Science (Software Eng)", outcome: "Modify backend API code structures based on code review feedback from campus IT teams.", activity: "Agile development sprints where campus IT engineers conduct pull-request reviews.", assessment: "Sprint Release Notes & Pull-Request Log.", ulos: ["ulo_depth", "ulo_critical", "ulo_collab"] }],
+                  nonstem: [{ discipline: "Political Science (Policy Analysis)", outcome: "Adapt policy recommendation briefs based on feedback gathered during mock legislative hearings.", activity: "Roundtable presentation of preliminary briefs to policy staff.", assessment: "Revised Policy Brief.", ulos: ["ulo_critical", "ulo_comm", "ulo_global"] }],
+                  cocurricular: [{ discipline: "Campus Event Management", outcome: "Optimize event operations models in response to advisor critique on safety and budget constraints.", activity: "Mid-semester design review adjusting event logistics.", assessment: "Event Optimization Report.", ulos: ["ulo_resp", "ulo_collab", "ulo_lifelong"] }]
+                }
+              },
+              integrated: {
+                desc: "Feedback evaluates long-term impact, professional ethics, and public standard alignment.",
+                exemplars: {
+                  stem: [{ discipline: "Data Science (Medical AI Capstone)", outcome: "Refine diagnostic AI algorithms to resolve bias issues identified by hospital ethics boards.", activity: "Formal ethics board reviews presenting algorithmic fairness metrics.", assessment: "Ethics Board Compliance Audit.", ulos: ["ulo_depth", "ulo_critical", "ulo_resp", "ulo_global"] }],
+                  nonstem: [{ discipline: "Journalism (Investigative)", outcome: "Refine investigative journalism articles to meet professional legal and ethical standards.", activity: "Editorial reviews with legal counsel interrogating source documentation.", assessment: "Published Investigative Report.", ulos: ["ulo_comm", "ulo_critical", "ulo_resp"] }],
+                  cocurricular: [{ discipline: "Executive Leadership (SGA President)", outcome: "Refine executive administrative proposals based on feedback from university regents.", activity: "Formal presentation of student initiatives to university board committees.", assessment: "Final Approved Policy Directive.", ulos: ["ulo_resp", "ulo_comm", "ulo_global", "ulo_collab"] }]
+                }
+              }
             }
           }
-        }
+        ]
       },
       {
-        id: 2,
-        quadrant: 'B',
-        name: "Significant Investment of Time and Effort",
-        shortName: "Time & Effort",
-        tamuUlo: [1, 6], // 1: Master Depth, 6: Lifelong Learning
-        tiers: {
-          1: {
-            title: "Foundational (Level 1)",
-            descriptor: "Student effort is unevenly distributed, spiking heavily before major exams or final papers with minimal sustained engagement during intermediate weeks.",
-            recommendation: "Break major term deliverables into a scaffolded, multi-stage project timeline with low-stakes weekly or bi-weekly progress checks.",
-            aiPrompt: `Act as a Higher Education Curriculum Expert. I teach [Insert Course Name], where students complete a major final project: [Insert Project Description]. Currently, students submit the entire project at the end of the term, leading to last-minute, low-quality work.\n\nHelp me convert this into a scaffolded project timeline spread across a [Insert Number]-week semester.\n\nPlease generate:\n1. A 4-stage milestone schedule with specific deliverables for each milestone.\n2. A low-stakes peer-check activity for Stage 2 that takes 15 minutes of class time.\n3. A student-facing task breakdown guide that estimates student time commitment (hours/week) for each phase.`,
-            exemplars: {
-              stem: { slo: "Demonstrate consistent execution of laboratory procedures across term experiments.", activity: "Weekly lab work without formal intermediate milestones.", deliverable: "End-of-term lab notebook.", ulos: [1] },
-              nonStem: { slo: "Conduct background research on an assigned historical period.", activity: "Unscaffolded term paper assigned in Week 1, submitted in Week 15.", deliverable: "Final 10-page paper.", ulos: [1] },
-              coCurricular: { slo: "Participate in scheduled volunteer service events.", activity: "Log hours at the end of the semester.", deliverable: "Signed service log.", ulos: [4] }
+        quadrant: "QUADRANT B: CHALLENGE & RIGOR",
+        elements: [
+          {
+            id: "time_effort",
+            title: "3. Time & Effort Investment",
+            rationale: "Sustained time-on-task ensures deep cognitive processing and establishes durable professional work habits.",
+            tiers: {
+              foundational: {
+                desc: "Consistent structured engagement over a term (<20 hours); focus on establishing fundamental routines.",
+                exemplars: {
+                  stem: [{ discipline: "General Chemistry I", outcome: "Maintain a consistent weekly laboratory notebook meeting standardized scientific logging routines.", activity: "Weekly pre-lab prep work and post-lab observations totaling 15 hours across the semester.", assessment: "Weekly Lab Notebook Inspection.", ulos: ["ulo_depth", "ulo_lifelong"] }],
+                  nonstem: [{ discipline: "Communication (Public Speaking)", outcome: "Sustain regular speech prep, practice, and critique schedules across multiple presentations.", activity: "Out-of-class speech rehearsing and video self-critique totaling 15 project hours.", assessment: "Speech Rehearsal Log.", ulos: ["ulo_comm", "ulo_lifelong"] }],
+                  cocurricular: [{ discipline: "Intro to Student Leadership", outcome: "Demonstrate personal time-management habits using professional digital task boards.", activity: "Weekly project tracking updates logged in digital project management tools over 10 weeks.", assessment: "Weekly Task Completion Log.", ulos: ["ulo_lifelong", "ulo_resp"] }]
+                }
+              },
+              applied: {
+                desc: "Sustained intensity; substantial out-of-class effort (40–80 hours) dedicated to project milestone completion.",
+                exemplars: {
+                  stem: [{ discipline: "Environmental Science (Field Ecology)", outcome: "Execute an extended multi-week field sampling protocol requiring 50+ hours of lab and field work.", activity: "Bi-weekly field sampling trips across local watersheds.", assessment: "Final Watershed Analysis Report.", ulos: ["ulo_depth", "ulo_critical", "ulo_collab"] }],
+                  nonstem: [{ discipline: "Sociology (Fieldwork Methods)", outcome: "Conduct extensive observational fieldwork accumulating 60+ hours of qualitative data collection.", activity: "Fieldwork observation hours and qualitative data entry over 8 weeks.", assessment: "Fieldwork Transcript Archive.", ulos: ["ulo_critical", "ulo_global", "ulo_comm"] }],
+                  cocurricular: [{ discipline: "Student Program Coordination", outcome: "Coordinate semester-long campus program schedules requiring 60+ total project management hours.", activity: "Managing vendor logistics and live event setup teams.", assessment: "Program Operational Audit.", ulos: ["ulo_collab", "ulo_resp", "ulo_lifelong"] }]
+                }
+              },
+              integrated: {
+                desc: "Deep, immersive professional investment (100+ hours); managing complex project timelines and client demands.",
+                exemplars: {
+                  stem: [{ discipline: "Engineering Senior Capstone", outcome: "Dedicate 120+ hours toward building and testing an industry-sponsored engineering prototype.", activity: "Multi-phase engineering workflow involving CAD modeling and stress testing.", assessment: "Comprehensive Engineering Capstone Report.", ulos: ["ulo_depth", "ulo_critical", "ulo_comm", "ulo_collab"] }],
+                  nonstem: [{ discipline: "Management Consulting Practicum", outcome: "Sustain a 100+ hour professional engagement analyzing client supply chains or market data.", activity: "Full-semester consulting project conducting market surveys and data modeling.", assessment: "Client Strategy Deliverable.", ulos: ["ulo_depth", "ulo_critical", "ulo_comm", "ulo_resp"] }],
+                  cocurricular: [{ discipline: "Student Body Executive Leadership", outcome: "Lead an institutional organization for 120+ hours overseeing operations and budget allocation.", activity: "Year-long executive governance managing budgets and campus initiatives.", assessment: "Annual Institutional Impact Report.", ulos: ["ulo_resp", "ulo_comm", "ulo_global", "ulo_collab"] }]
+                }
+              }
             }
           },
-          2: {
-            title: "Developing / Applied (Level 2)",
-            descriptor: "Milestones exist across the term, but students treat intermediate submissions as transactional deadlines rather than deep iterative effort.",
-            recommendation: "Incorporate reflective progress logs and required draft revisions between milestones to deepen sustained engagement.",
-            aiPrompt: `Act as an Instructional Designer. I teach [Insert Course Name]. Students submit milestones for [Insert Project], but treat them as quick checkpoints rather than engaging deeply.\n\nPlease generate:\n1. A structured 5-minute weekly 'Effort & Progress Log' template for students.\n2. A revision protocol requiring students to state how they acted on milestone feedback.\n3. A student-facing rationale on why sustained effort improves long-term mastery.`,
-            exemplars: {
-              stem: { slo: "Iteratively refine computer algorithms based on performance profiling over 6 weeks.", activity: "Bi-weekly code commits and peer code reviews.", deliverable: "Version-controlled codebase & benchmark logs.", ulos: [1, 2] },
-              nonStem: { slo: "Draft, critique, and revise an extended policy memorandum across three distinct phases.", activity: "Peer draft critique workshops in Weeks 4, 8, and 12.", deliverable: "Annotated drafting portfolio.", ulos: [2, 3] },
-              coCurricular: { slo: "Manage a multi-week community outreach drive with scheduled weekly targets.", activity: "Weekly team lead progress check-ins.", deliverable: "Weekly milestone progress reports.", ulos: [4, 7] }
-            }
-          },
-          3: {
-            title: "Advanced / Integrated (Level 3)",
-            descriptor: "Extended, cumulative project work demands sustained, intense intellectual energy and problem-solving over a prolonged duration.",
-            recommendation: "Provide workload management strategies and structured collaborative accountability groups to support sustained high effort.",
-            aiPrompt: `Act as a Student Success & Curriculum Architect. I teach an intensive course: [Insert Course Name].\n\nHelp me design an accountability framework to support students through heavy project workloads.\n\nPlease generate:\n1. A peer-accountability triadic check-in system.\n2. A stress-mitigation and time-budgeting worksheet for complex team projects.\n3. A rubric evaluating sustained project management and iterative development.`,
-            exemplars: {
-              stem: { slo: "Sustain a multi-phase experimental research protocol over 14 weeks requiring continuous data acquisition.", activity: "Daily lab tracking, trouble-shooting, and bi-weekly research team briefings.", deliverable: "Comprehensive scientific manuscript and dataset.", ulos: [1, 2, 6] },
-              nonStem: { slo: "Execute an authentic market analysis and launch strategy requiring continuous field research.", activity: "Sustained stakeholder interview cycles and consumer testing over 12 weeks.", deliverable: "Fully validated enterprise strategy dossier.", ulos: [1, 3, 6] },
-              coCurricular: { slo: "Direct a year-long student advisory board executing institutional campus reform.", activity: "Weekly executive board sessions, stakeholder meetings, and policy drafting.", deliverable: "Institutional policy reform dossier & governance transition plan.", ulos: [4, 6, 7] }
+          {
+            id: "high_expectations",
+            title: "4. High Performance Expectations",
+            rationale: "Setting challenging standards scaffolded by rubrics pushes students to perform at professional caliber levels.",
+            tiers: {
+              foundational: {
+                desc: "Clear explicit benchmarks and rubrics introduced early to establish academic and technical rigor.",
+                exemplars: {
+                  stem: [{ discipline: "Physics (Modern Physics)", outcome: "Adhere to formal scientific manuscript formatting guidelines when reporting laboratory outcomes.", activity: "Drafting lab reports structured strictly in accordance with Physical Review Letters style guides.", assessment: "Formatted Manuscript Deliverable.", ulos: ["ulo_depth", "ulo_comm"] }],
+                  nonstem: [{ discipline: "Art History (Renaissance Art)", outcome: "Formulate research papers meeting formal Chicago Manual of Style citation standards.", activity: "Archival citation drills and annotated bibliography drafting.", assessment: "Annotated Bibliography.", ulos: ["ulo_depth", "ulo_comm"] }],
+                  cocurricular: [{ discipline: "Student Organization Finance", outcome: "Prepare annual budget proposals adhering to university SOFC accounting standards.", activity: "Audit preparation workshops reviewing campus financial compliance regulations.", assessment: "SOFC Budget Proposal.", ulos: ["ulo_resp", "ulo_depth"] }]
+                }
+              },
+              applied: {
+                desc: "Standards modeled after entry-level industry or academic research quality expectations.",
+                exemplars: {
+                  stem: [{ discipline: "Chemical Engineering (Process Design)", outcome: "Design process flow diagrams meeting professional AIChE safety and efficiency standards.", activity: "Process simulation sprints using industry software (Aspen Plus).", assessment: "Process Design Package.", ulos: ["ulo_depth", "ulo_critical", "ulo_resp"] }],
+                  nonstem: [{ discipline: "Finance (Corporate Valuation)", outcome: "Construct discounted cash flow (DCF) financial models matching Wall Street analyst standards.", activity: "Valuing real public firms using Bloomberg Terminals.", assessment: "Equity Research Report.", ulos: ["ulo_depth", "ulo_critical", "ulo_comm"] }],
+                  cocurricular: [{ discipline: "Multicultural Student Services", outcome: "Design university-wide heritage month programs meeting professional event standards.", activity: "Managing $10,000+ budgets and vendor contracts.", assessment: "Event Quality Audit.", ulos: ["ulo_global", "ulo_resp", "ulo_collab"] }]
+                }
+              },
+              integrated: {
+                desc: "Professional-grade deliverables subjected to external peer or client review against industry benchmarks.",
+                exemplars: {
+                  stem: [{ discipline: "Biomedical Engineering (Device Capstone)", outcome: "Develop medical device prototypes that pass ISO 13485 quality control audits.", activity: "Building and testing device performance under external clinical oversight.", assessment: "ISO Quality Audit Portfolio.", ulos: ["ulo_depth", "ulo_critical", "ulo_resp", "ulo_collab"] }],
+                  nonstem: [{ discipline: "Law / Moot Court Competition", outcome: "Argue appellate oral briefs before sitting federal and state court judges.", activity: "Nationally competitive mock appellate arguments subject to strict judicial scoring.", assessment: "Appellate Brief Deliverable.", ulos: ["ulo_comm", "ulo_critical", "ulo_depth", "ulo_resp"] }],
+                  cocurricular: [{ discipline: "SGA Student Body President", outcome: "Negotiate campus legislative priorities directly with university System Regents.", activity: "Formal testimony and executive briefings before university board members.", assessment: "System Board Legislative Briefing.", ulos: ["ulo_resp", "ulo_comm", "ulo_global", "ulo_collab"] }]
+                }
+              }
             }
           }
-        }
+        ]
       },
       {
-        id: 3,
-        quadrant: 'A',
-        name: "Meaningful Interactions with Faculty and Peers",
-        shortName: "Interactions",
-        tamuUlo: [3, 7], // 3: Communicate, 7: Work Collaboratively
-        tiers: {
-          1: {
-            title: "Foundational (Level 1)",
-            descriptor: "Interaction is predominantly instructor-led lecture with occasional unstructured Q&A; peer interaction is limited or optional.",
-            recommendation: "Embed structured peer-review cycles and short, high-impact micro-conferences into project work cycles.",
-            aiPrompt: `Act as an Instructional Designer expert in active learning. In my course [Insert Course Name], students work on [Insert Project/Assignment]. I want to create a structured, efficient peer review and faculty check-in protocol that improves work quality before final submission.\n\nPlease generate:\n1. A 20-minute, 3-step structured peer feedback protocol (Praise, Question, Polish) tailored to evaluate [Insert Specific Skill/Deliverable].\n2. A 3-question self-assessment sheet students must complete before meeting with me for a 3-minute mid-project conference.\n3. A brief guide on how students should respond to peer feedback in a revision memo.`,
-            exemplars: {
-              stem: { slo: "Listen to lecture concepts and participate in optional instructor office hours.", activity: "Traditional lecture with occasional open Q&A.", deliverable: "Exams.", ulos: [1] },
-              nonStem: { slo: "Participate in general class discussions on weekly readings.", activity: "Open classroom discussion.", deliverable: "Participation grade.", ulos: [3] },
-              coCurricular: { slo: "Attend mandatory organization business meetings.", activity: "Monthly membership meetings.", deliverable: "Attendance log.", ulos: [7] }
+        quadrant: "QUADRANT C: RELEVANCE & APPLICATION",
+        elements: [
+          {
+            id: "real_world",
+            title: "5. Real-World Application & Context",
+            rationale: "Connecting academic concepts to authentic real-world contexts increases motivation and reinforces skill transferability.",
+            tiers: {
+              foundational: {
+                desc: "Case studies, authentic simulations, and field observations bridging classroom theory and practice.",
+                exemplars: {
+                  stem: [{ discipline: "Introductory Geology", outcome: "Identify real-world geological fault lines using local topographic maps.", activity: "Analyzing active fault line case studies in Texas using GIS mapping tools.", assessment: "Geological Map Analysis Worksheet.", ulos: ["ulo_depth", "ulo_critical"] }],
+                  nonstem: [{ discipline: "Business Law", outcome: "Analyze contract breach legal scenarios using contemporary corporate case studies.", activity: "Dissecting real corporate lawsuit filings.", assessment: "Legal Case Brief Submission.", ulos: ["ulo_depth", "ulo_critical"] }],
+                  cocurricular: [{ discipline: "Student Organization Management", outcome: "Apply university event permitting regulations to mock student campus events.", activity: "Navigating university room reservation and risk management portals.", assessment: "Mock Event Permit Application Suite.", ulos: ["ulo_resp", "ulo_lifelong"] }]
+                }
+              },
+              applied: {
+                desc: "Direct field practice, client consulting projects, and community-engaged problem solving.",
+                exemplars: {
+                  stem: [{ discipline: "Civil Engineering (Transportation)", outcome: "Formulate traffic flow interventions for high-congestion campus intersections.", activity: "Collecting physical traffic count data at campus intersections.", assessment: "Intersection Traffic Mitigation Proposal.", ulos: ["ulo_depth", "ulo_critical", "ulo_comm"] }],
+                  nonstem: [{ discipline: "Marketing (Non-Profit Consulting)", outcome: "Develop fundraising campaigns for local community non-profit organizations.", activity: "Partnering with local charities to audit social media outreach.", assessment: "Non-Profit Marketing Strategy Deliverable.", ulos: ["ulo_comm", "ulo_critical", "ulo_resp", "ulo_collab"] }],
+                  cocurricular: [{ discipline: "Community Service Center", outcome: "Coordinate local food bank distribution operations meeting community demand.", activity: "Managing inventory and distribution logistics at local food pantries.", assessment: "Food Security Distribution Audit.", ulos: ["ulo_resp", "ulo_global", "ulo_collab"] }]
+                }
+              },
+              integrated: {
+                desc: "Full-immersion clinical rotations, co-ops, client capstones, and community-embedded internships.",
+                exemplars: {
+                  stem: [{ discipline: "Electrical Engineering Co-Op", outcome: "Complete 14-week full-time industrial engineering co-op assignments.", activity: "Embedded full-time workplace duties optimizing semiconductor yield pipelines.", assessment: "Industrial Co-Op Employer Evaluation.", ulos: ["ulo_depth", "ulo_critical", "ulo_comm", "ulo_lifelong"] }],
+                  nonstem: [{ discipline: "Accounting Internship (Big Four)", outcome: "Execute professional corporate audit procedures for enterprise clients.", activity: "Full-time corporate auditing and tax preparation.", assessment: "Enterprise Internship Performance Review.", ulos: ["ulo_depth", "ulo_critical", "ulo_resp"] }],
+                  cocurricular: [{ discipline: "Executive Internship (University System)", outcome: "Manage system-wide policy administrative initiatives directly under Vice Chancellors.", activity: "Full-time executive internship drafting policy memos.", assessment: "Executive Director Evaluation.", ulos: ["ulo_resp", "ulo_comm", "ulo_critical", "ulo_collab"] }]
+                }
+              }
             }
           },
-          2: {
-            title: "Developing / Applied (Level 2)",
-            descriptor: "Peer discussions and group work occur regularly, but interactions lack structured roles, clear feedback protocols, or deep faculty feedback.",
-            recommendation: "Formalize peer roles and integrate formative micro-check-ins into team activities.",
-            aiPrompt: `Act as an Active Learning Consultant. I teach [Insert Course Name]. I use group discussions on [Insert Topic], but student interaction remains superficial.\n\nPlease generate:\n1. Four defined group roles (e.g., Synthesizer, Skeptic, Advocate, Recorder) tailored to my topic.\n2. A structured 15-minute debate or collaborative mapping protocol.\n3. A faculty observation checklist to evaluate the depth of peer interaction.`,
-            exemplars: {
-              stem: { slo: "Collaborate in structured peer lab pairs using role rotation (Driver / Observer).", activity: "Lab peer pairing with mandatory role swapping.", deliverable: "Co-authored lab report.", ulos: [3, 7] },
-              nonStem: { slo: "Engage in structured peer revision circles evaluating essay drafts using explicit rubrics.", activity: "Small group peer editing workshops.", deliverable: "Peer review feedback forms.", ulos: [3, 7] },
-              coCurricular: { slo: "Co-organize student leadership retreats with assigned peer facilitator roles.", activity: "Structured committee planning workshops.", deliverable: "Event execution blueprint.", ulos: [3, 7] }
-            }
-          },
-          3: {
-            title: "Advanced / Integrated (Level 3)",
-            descriptor: "Frequent, substantive interactions occur continuously between faculty and peers regarding course content, mentoring, and professional growth.",
-            recommendation: "Establish collaborative research or co-creation frameworks where faculty and students operate as co-investigators.",
-            aiPrompt: `Act as a Higher Education Mentorship Specialist. I teach [Insert Course Name].\n\nHelp me structure a co-creation framework where students collaborate directly with faculty on authentic disciplinary challenges.\n\nPlease generate:\n1. A bi-weekly research/project check-in template.\n2. A co-mentoring protocol for student leads.\n3. A qualitative evaluation tool for collaborative learning culture.`,
-            exemplars: {
-              stem: { slo: "Co-investigate research hypotheses alongside faculty and graduate mentors in lab settings.", activity: "Weekly research group defense meetings and 1-on-1 faculty mentoring.", deliverable: "Co-authored manuscript/grant proposal.", ulos: [1, 3, 7] },
-              nonStem: { slo: "Partner with faculty to design and facilitate community research dialogues.", activity: "Bi-weekly project strategy sessions with faculty mentor.", deliverable: "Community symposium & co-designed publication.", ulos: [3, 5, 7] },
-              coCurricular: { slo: "Engage in 1-on-1 executive coaching with staff advisors to refine institutional leadership.", activity: "Bi-weekly structured mentoring and 360-degree peer leadership reviews.", deliverable: "Personalized leadership portfolio & succession model.", ulos: [3, 4, 7] }
+          {
+            id: "diversity_global",
+            title: "6. Diversity & Global Perspectives",
+            rationale: "Engaging diverse cultures, viewpoints, and global contexts develops cultural humility and complex problem-solving abilities.",
+            tiers: {
+              foundational: {
+                desc: "Comparative cultural analysis, global case studies, and structured intercultural dialogue frameworks.",
+                exemplars: {
+                  stem: [{ discipline: "Global Public Health", outcome: "Compare infectious disease containment protocols between Western and global south healthcare systems.", activity: "Analyzing WHO global health datasets in comparative seminar discussions.", assessment: "Comparative Public Health Brief.", ulos: ["ulo_global", "ulo_critical"] }],
+                  nonstem: [{ discipline: "Anthropology (Cultural)", outcome: "Deconstruct cultural ethnographies using relativistic analytical frameworks.", activity: "Guided ethnographic text analysis.", assessment: "Ethnographic Critique Essay.", ulos: ["ulo_global", "ulo_critical"] }],
+                  cocurricular: [{ discipline: "Multicultural Student Services", outcome: "Identify core principles of cultural humility during campus diversity workshops.", activity: "Attending structured intercultural dialogue sessions.", assessment: "Cultural Humility Self-Reflection Log.", ulos: ["ulo_global", "ulo_resp"] }]
+                }
+              },
+              applied: {
+                desc: "Domestic or international immersion, cross-cultural team projects, and community engagement with diverse populations.",
+                exemplars: {
+                  stem: [{ discipline: "Engineers Without Borders", outcome: "Co-design clean water filtration systems tailored to local rural community needs in Central America.", activity: "Remote engineering consultations with local community leaders.", assessment: "Community-Adapted Design Specification.", ulos: ["ulo_global", "ulo_depth", "ulo_resp", "ulo_collab"] }],
+                  nonstem: [{ discipline: "Bilingual Education Practicum", outcome: "Deliver English as a Second Language (ESL) tutoring for local immigrant adult learners.", activity: "Weekly community literacy coaching sessions.", assessment: "ESL Coaching Progress Portfolio.", ulos: ["ulo_global", "ulo_comm", "ulo_resp"] }],
+                  cocurricular: [{ discipline: "Multicultural Council", outcome: "Coordinate cross-cultural campus forums addressing global human rights issues.", activity: "Planning and moderating inter-faith student panels.", assessment: "Global Rights Forum Execution Report.", ulos: ["ulo_global", "ulo_comm", "ulo_resp", "ulo_collab"] }]
+                }
+              },
+              integrated: {
+                desc: "Full semester study abroad, global internship, or leading sustained international equity initiatives.",
+                exemplars: {
+                  stem: [{ discipline: "Global Engineering Semester Abroad", outcome: "Complete a full semester of engineering coursework taught at an international partner university.", activity: "Full-time enrollment in European or Asian engineering university courses.", assessment: "International Academic Transcript.", ulos: ["ulo_global", "ulo_depth", "ulo_critical", "ulo_lifelong"] }],
+                  nonstem: [{ discipline: "International NGO Internship", outcome: "Draft human rights compliance reports for international agencies in Geneva or DC.", activity: "Full-time internship analyzing global treaty compliance data.", assessment: "NGO Treaty Compliance Portfolio.", ulos: ["ulo_global", "ulo_resp", "ulo_comm", "ulo_critical"] }],
+                  cocurricular: [{ discipline: "International Student Federation President", outcome: "Represent 5,000+ international students in university System administration meetings.", activity: "Directing international student advocacy campaigns.", assessment: "Annual International Student Advocacy Audit.", ulos: ["ulo_global", "ulo_resp", "ulo_comm", "ulo_collab"] }]
+                }
+              }
             }
           }
-        }
+        ]
       },
       {
-        id: 4,
-        quadrant: 'C',
-        name: "Experiences with Diversity & Global Perspectives",
-        shortName: "Diversity & Global",
-        tamuUlo: [4, 5], // 4: Personal & Social Responsibility, 5: Social, Cultural & Global Competence
-        tiers: {
-          1: {
-            title: "Foundational (Level 1)",
-            descriptor: "Course content primarily presents single-perspective or traditional frameworks, with limited engagement with diverse cultural or global contexts.",
-            recommendation: "Introduce comparative case studies or diverse scholarly perspectives that challenge foundational assumptions within the field.",
-            aiPrompt: `Act as a Culturally Responsive Pedagogy Specialist in higher education. I teach [Insert Course Name] focusing on [Insert Main Topic/Discipline]. Currently, my course material primarily focuses on traditional or domestic perspectives.\n\nHelp me diversify the perspectives in my curriculum without sacrificing core discipline coverage.\n\nPlease generate:\n1. Three alternative case study concepts or global examples that apply core course principles to diverse, underrepresented, or international contexts.\n2. Two discussion prompts that encourage students to critically examine how cultural, economic, or geographic context alters problem-solving in [Insert Field].\n3. A list of 3 search strategies/databases to help me locate open-access readings from global scholars in this field.`,
-            exemplars: {
-              stem: { slo: "Identify global engineering standards and domestic compliance rules.", activity: "Read standard international building codes.", deliverable: "Quiz on global compliance.", ulos: [5] },
-              nonStem: { slo: "Recognize diverse cultural viewpoints in introductory literary texts.", activity: "Assigned readings from diverse authors.", deliverable: "Reading reaction posts.", ulos: [5] },
-              coCurricular: { slo: "Acknowledge cultural awareness values during campus diversity workshops.", activity: "Attend a campus cultural seminar.", deliverable: "Attendance verification.", ulos: [5] }
+        quadrant: "QUADRANT D: INTEGRATION & REFLECTION",
+        elements: [
+          {
+            id: "reflection",
+            title: "7. Structured Reflection & Metacognition",
+            rationale: "Guided reflection connects experience to theory, turning active doing into permanent cognitive learning and self-awareness.",
+            tiers: {
+              foundational: {
+                desc: "Guided reflective prompts, learning journals, and muddiest-point self-assessments.",
+                exemplars: {
+                  stem: [{ discipline: "Introductory Computer Science", outcome: "Identify personal debugging habit errors through weekly coding reflection logs.", activity: "Submitting weekly 250-word reflective entries detailing coding roadblocks.", assessment: "Weekly Debugging Reflection Journal.", ulos: ["ulo_critical", "ulo_lifelong"] }],
+                  nonstem: [{ discipline: "Introductory Sociology", outcome: "Relate personal life experiences to sociological concepts using guided reflective prompts.", activity: "Bi-weekly reflective essays connecting personal biography to structural concepts.", assessment: "Sociological Imagination Reflection Portfolio.", ulos: ["ulo_critical", "ulo_global", "ulo_lifelong"] }],
+                  cocurricular: [{ discipline: "First-Year Seminar", outcome: "Articulate personal college transition goals using structured self-reflection journals.", activity: "Weekly guided reflective journal entries on academic transition.", assessment: "First-Year Transition Reflection Log.", ulos: ["ulo_lifelong"] }]
+                }
+              },
+              applied: {
+                desc: "Critical incident reflections, mid-project metacognitive course corrections, and ePortfolios.",
+                exemplars: {
+                  stem: [{ discipline: "Intermediate Software Engineering", outcome: "Evaluate technical failure recovery decisions during agile sprint retrospectives.", activity: "Conducting formal team retrospectives after every 2-week software sprint.", assessment: "Sprint Retrospective Memo.", ulos: ["ulo_critical", "ulo_collab", "ulo_lifelong"] }],
+                  nonstem: [{ discipline: "Teacher Education Practicum", outcome: "Analyze instructional teaching effectiveness through video self-reflection logs.", activity: "Video recording student-teaching lessons and writing detailed reflection critiques.", assessment: "Video Teaching Analysis Portfolio.", ulos: ["ulo_comm", "ulo_critical", "ulo_lifelong"] }],
+                  cocurricular: [{ discipline: "Student Organization Presidents", outcome: "Evaluate organizational conflict resolution decisions through structured peer retrospectives.", activity: "Monthly executive board reflective debriefs analyzing leadership challenges.", assessment: "Leadership Debrief Portfolio.", ulos: ["ulo_resp", "ulo_collab", "ulo_lifelong"] }]
+                }
+              },
+              integrated: {
+                desc: "Comprehensive integrative ePortfolios synthesizing multi-year growth, capstone defense reflections, and professional identity statements.",
+                exemplars: {
+                  stem: [{ discipline: "Engineering Senior Capstone", outcome: "Synthesize 4-year engineering competency growth in a public professional showcase ePortfolio.", activity: "Curating a capstone ePortfolio documenting engineering design projects.", assessment: "Integrative Engineering Capstone ePortfolio.", ulos: ["ulo_depth", "ulo_critical", "ulo_comm", "ulo_lifelong", "ulo_resp"] }],
+                  nonstem: [{ discipline: "Senior University Honors ePortfolio", outcome: "Synthesize interdisciplinary learning across core and major experiences in a capstone ePortfolio.", activity: "Curating a university-wide honors ePortfolio linking academic coursework to TAMU ULOs.", assessment: "Comprehensive Honors ePortfolio.", ulos: ["ulo_depth", "ulo_critical", "ulo_comm", "ulo_global", "ulo_resp", "ulo_lifelong"] }],
+                  cocurricular: [{ discipline: "Maroon & White Leadership Society", outcome: "Defend a comprehensive personal leadership portfolio before a faculty evaluation committee.", activity: "Multi-year leadership portfolio defense demonstrating mastery of core TAMU leadership competencies.", assessment: "Maroon & White Leadership Portfolio Defense.", ulos: ["ulo_resp", "ulo_comm", "ulo_global", "ulo_lifelong", "ulo_collab"] }]
+                }
+              }
             }
           },
-          2: {
-            title: "Developing / Applied (Level 2)",
-            descriptor: "Diverse readings or guest speakers are included, but remain supplementary rather than integrated into core assessments or analytical models.",
-            recommendation: "Integrate diverse perspectives directly into core assessment rubrics and comparative analytical assignments.",
-            aiPrompt: `Act as a Curriculum Inclusion Expert. I teach [Insert Course Name]. I include diverse readings on [Insert Topics], but students are not required to synthesize them in major assignments.\n\nPlease generate:\n1. A comparative analysis essay prompt requiring integration of global/diverse frameworks.\n2. A grading rubric criterion assessing intercultural analytical depth.\n3. A structured discussion protocol for analyzing conflicting cultural viewpoints.`,
-            exemplars: {
-              stem: { slo: "Compare how different geographic regions adapt infrastructure design to regional climate impacts.", activity: "Comparative engineering case studies evaluating global infrastructure.", deliverable: "Cross-cultural technical analysis paper.", ulos: [2, 5] },
-              nonStem: { slo: "Critique international business practices across emerging vs. developed market economies.", activity: "Simulated international trade negotiation exercises.", deliverable: "Cross-border strategy brief.", ulos: [3, 5] },
-              coCurricular: { slo: "Facilitate inclusive community dialogues with student groups from varied backgrounds.", activity: "Intergroup dialogue facilitation training.", deliverable: "Facilitation reflection memo.", ulos: [4, 5] }
-            }
-          },
-          3: {
-            title: "Advanced / Integrated (Level 3)",
-            descriptor: "Students actively engage with diverse individuals, communities, or global systems, experiencing real worldview challenges and intercultural growth.",
-            recommendation: "Foster immersive community-engaged learning or virtual international exchanges (COIL) with structured reflection.",
-            aiPrompt: `Act as an Intercultural Education Director. I teach [Insert Course Name].\n\nHelp me structure a Collaborative Online International Learning (COIL) module or community cultural exchange.\n\nPlease generate:\n1. A 3-week joint project blueprint between my students and external partners.\n2. An intercultural communication reflection prompt.\n3. An assessment rubric for global civic competency.`,
-            exemplars: {
-              stem: { slo: "Co-design clean water systems with international community partners through virtual global collaboration (COIL).", activity: "Semester-long COIL project with engineering students in Latin America.", deliverable: "Joint bilingual technical specification report.", ulos: [3, 5, 7] },
-              nonStem: { slo: "Evaluate non-profit economic interventions by conducting field-based user research in diverse local/global communities.", activity: "Community-engaged field research immersion.", deliverable: "Stakeholder-validated policy recommendation.", ulos: [2, 4, 5] },
-              coCurricular: { slo: "Direct cross-cultural advocacy partnerships supporting underrepresented community organizations.", activity: "Year-long community service learning partnership.", deliverable: "Community-impact monograph & oral defense.", ulos: [4, 5, 6] }
+          {
+            id: "public_demo",
+            title: "8. Public Demonstration of Competence",
+            rationale: "Publicly presenting work elevates student accountability, simulates professional defense, and creates celebrated learning milestones.",
+            tiers: {
+              foundational: {
+                desc: "In-class poster sessions, team presentations to peers, and internal classroom mini-symposia.",
+                exemplars: {
+                  stem: [{ discipline: "Introductory Engineering (ENGR 102)", outcome: "Present team physical prototype models to classmate audiences during poster sessions.", activity: "Designing and presenting a 3-minute team poster pitch to classmate judges.", assessment: "Classroom Poster Session Presentation Rubric.", ulos: ["ulo_comm", "ulo_collab"] }],
+                  nonstem: [{ discipline: "Public Speaking (COMM 205)", outcome: "Deliver persuasive speeches to classroom audiences utilizing visual presentation aids.", activity: "Delivering a 7-minute persuasive speech evaluated live by classmates.", assessment: "Persuasive Speech Evaluation Rubric.", ulos: ["ulo_comm", "ulo_critical"] }],
+                  cocurricular: [{ discipline: "Student Leader Orientation", outcome: "Present annual organization goals to peer leadership cohorts during onboarding retreats.", activity: "5-minute organization goal presentations delivered during leadership workshops.", assessment: "Peer Presentation Rubric.", ulos: ["ulo_comm", "ulo_collab"] }]
+                }
+              },
+              applied: {
+                desc: "Departmental symposia, campus-wide research conferences (URWC), and client presentation briefings.",
+                exemplars: {
+                  stem: [{ discipline: "Undergraduate Research (URWC)", outcome: "Present original undergraduate research findings at campus-wide research symposia.", activity: "Delivering formal poster presentations to university faculty and guest judge panels.", assessment: "URWC Research Poster Presentation Evaluation.", ulos: ["ulo_comm", "ulo_depth", "ulo_critical"] }],
+                  nonstem: [{ discipline: "Mays Business School Competition", outcome: "Pitch strategic business case solutions to corporate executive judging panels.", activity: "Competitive case competition presentations defending financial models before corporate judges.", assessment: "Executive Case Competition Scorecard.", ulos: ["ulo_comm", "ulo_critical", "ulo_depth"] }],
+                  cocurricular: [{ discipline: "Student Affairs Leadership Showcase", outcome: "Present student organization community impact metrics at annual university leadership galas.", activity: "Delivering keynote poster presentations to university donors and Vice Presidents.", assessment: "Leadership Showcase Presentation Rubric.", ulos: ["ulo_comm", "ulo_resp", "ulo_global"] }]
+                }
+              },
+              integrated: {
+                desc: "National academic conference presentations, published articles, client board defenses, and public performances.",
+                exemplars: {
+                  stem: [{ discipline: "National STEM Conference Defense", outcome: "Present original research papers at national academic conferences.", activity: "Delivering 15-minute oral research presentations to national research faculty.", assessment: "National Conference Presentation Certification.", ulos: ["ulo_comm", "ulo_depth", "ulo_critical", "ulo_lifelong"] }],
+                  nonstem: [{ discipline: "National Public Policy Forum", outcome: "Present legislative policy research at national undergraduate policy conferences in Washington DC.", activity: "Defending policy briefs before congressional staff and think tank analysts.", assessment: "National Policy Forum Defense Evaluation.", ulos: ["ulo_comm", "ulo_critical", "ulo_resp", "ulo_global"] }],
+                  cocurricular: [{ discipline: "National SGA Leadership Conference", outcome: "Deliver keynote presentations on student governance at national higher education conferences.", activity: "Delivering keynote addresses to university student body presidents nationwide.", assessment: "National Keynote Speaker Evaluation.", ulos: ["ulo_comm", "ulo_resp", "ulo_global", "ulo_collab"] }]
+                }
+              }
             }
           }
-        }
-      },
-      {
-        id: 5,
-        quadrant: 'A',
-        name: "Frequent, Timely, and Constructive Feedback",
-        shortName: "Feedback",
-        tamuUlo: [2, 3], // 2: Critical Thinking, 3: Communicate
-        tiers: {
-          1: {
-            title: "Foundational (Level 1)",
-            descriptor: "Feedback consists primarily of numeric grades on high-stakes assessments given late in the term with limited diagnostic comments.",
-            recommendation: "Implement iterative 'draft-and-resubmit' loops or milestone-based feedback that requires students to explicitly apply comments.",
-            aiPrompt: `Act as an Assessment Expert in Higher Education. I teach [Insert Course Name] with [Insert Class Size] students. I give detailed feedback on [Insert Assignment Name], but students rarely implement my feedback on subsequent work.\n\nHelp me design a sustainable feedback-application loop that fits my teaching workload.\n\nPlease generate:\n1. A 'Feedback Action Plan' template (1-page) that students must submit alongside their revised draft, showing where and how they addressed past feedback.\n2. A streamlined 4-part analytic rubric focusing strictly on growth, revision depth, and response to feedback.\n3. Three boilerplate text templates I can use for quick, high-impact feedback on recurring student errors in [Insert Specific Skill].`,
-            exemplars: {
-              stem: { slo: "Receive numeric grades on mid-term and final exams without diagnostic feedback.", activity: "High-stakes exam grading.", deliverable: "Graded exam papers.", ulos: [1] },
-              nonStem: { slo: "Receive end-of-semester comments on final essay submissions.", activity: "Instructor grading at term end.", deliverable: "Final paper grade.", ulos: [3] },
-              coCurricular: { slo: "Receive an annual performance evaluation score.", activity: "Year-end review meeting.", deliverable: "Evaluation form.", ulos: [4] }
-            }
-          },
-          2: {
-            title: "Developing / Applied (Level 2)",
-            descriptor: "Formative feedback is provided on drafts, but lacks immediate opportunities for students to revise or demonstrate growth before final grading.",
-            recommendation: "Establish required revision memos where students document how they addressed specific feedback points.",
-            aiPrompt: `Act as an Educational Assessment Specialist. I teach [Insert Course Name]. I provide comments on mid-term drafts, but want to ensure students actively process them.\n\nPlease generate:\n1. A revision memo submission template for students.\n2. A rapid-grading key/shorthand system for faculty comments.\n3. A self-assessment reflection prompt for post-assignment return.`,
-            exemplars: {
-              stem: { slo: "Incorporate instructor feedback on preliminary lab reports into subsequent experiments.", activity: "Formative grading on draft reports with required correction logs.", deliverable: "Revised lab report & error correction log.", ulos: [1, 2] },
-              nonStem: { slo: "Apply peer and instructor feedback to draft revisions before submitting term research papers.", activity: "Draft review cycles with required revision memos.", deliverable: "Final draft accompanied by revision response memo.", ulos: [2, 3] },
-              coCurricular: { slo: "Refine program proposals based on mid-term committee feedback.", activity: "Formative review pitch session with advisory council.", deliverable: "Revised program blueprint.", ulos: [3, 4] }
-            }
-          },
-          3: {
-            title: "Advanced / Integrated (Level 3)",
-            descriptor: "Continuous, multi-source feedback (faculty, peer, external experts) is embedded throughout, directly informing immediate revision and mastery.",
-            recommendation: "Automate formative diagnostic checks and incorporate external professional feedback panels.",
-            aiPrompt: `Act as an Assessment Systems Designer. I teach [Insert Course Name].\n\nHelp me design an integrated multi-source feedback loop involving peers and industry professionals.\n\nPlease generate:\n1. A rubric for external reviewer evaluation.\n2. A automated feedback loop workflow for multi-stage deliverables.\n3. A student growth tracking rubric.`,
-            exemplars: {
-              stem: { slo: "Iteratively improve prototype design based on real-time sensor feedback, peer critiques, and industry mentor reviews.", activity: "Weekly design review sprints with external engineer feedback panels.", deliverable: "Iterative engineering logs & revised functional prototype.", ulos: [1, 2, 6] },
-              nonStem: { slo: "Refine corporate consulting reports through multiple feedback loops involving clients, peers, and writing specialists.", activity: "Multi-stage client critique feedback loops.", deliverable: "Polished strategy dossier & feedback integration matrix.", ulos: [2, 3, 6] },
-              coCurricular: { slo: "Adapt leadership initiatives in real-time based on 360-degree feedback from peers, participants, and supervisors.", activity: "Bi-weekly 360-degree survey feedback debriefs.", deliverable: "Continuous leadership growth journal & adaptive strategy plan.", ulos: [3, 4, 6] }
-            }
-          }
-        }
-      },
-      {
-        id: 6,
-        quadrant: 'C',
-        name: "Authentic Real-World Application",
-        shortName: "Authentic Application",
-        tamuUlo: [1, 2, 4], // 1: Master Depth, 2: Critical Thinking, 4: Personal Responsibility
-        tiers: {
-          1: {
-            title: "Foundational (Level 1)",
-            descriptor: "Assignments are academic exercises evaluated solely by instructor, lacking connection to real-world audiences or industry practices.",
-            recommendation: "Shift standard academic papers into authentic professional deliverables (e.g., policy memos, client pitches, technical reports).",
-            aiPrompt: `Act as an Industry Liaison and Instructional Designer. I teach [Insert Course Name]. My current assignment is a traditional academic paper on [Insert Topic]. \n\nI want to transform this into an authentic, industry-standard deliverable that reflects actual work in [Insert Target Field/Profession].\n\nPlease generate:\n1. Three authentic deliverable formats (e.g., Executive Briefing, Client Strategy Proposal, Public Whitepaper) that require the same research depth as a term paper.\n2. A real-world scenario prompt framing the assignment for the student as a professional practitioner.\n3. An evaluation rubric aligned with professional communication standards in [Insert Industry].`,
-            exemplars: {
-              stem: { slo: "Solve textbook physics problems using idealized variables.", activity: "End-of-chapter textbook problems.", deliverable: "Homework assignment sheets.", ulos: [1] },
-              nonStem: { slo: "Write a standard literature review on corporate finance theory.", activity: "Library research paper.", deliverable: "15-page academic paper.", ulos: [1] },
-              coCurricular: { slo: "Study general leadership theories in student handbook readings.", activity: "Read policy manual.", deliverable: "Handbook quiz.", ulos: [4] }
-            }
-          },
-          2: {
-            title: "Developing / Applied (Level 2)",
-            descriptor: "Assignments use real-world case studies or datasets, but final deliverables remain internal academic papers submitted only to the instructor.",
-            recommendation: "Partner with community clients or format deliverables for real external stakeholders.",
-            aiPrompt: `Act as an Experiential Learning Designer. I teach [Insert Course Name]. Students analyze real data about [Insert Topic], but turn in a standard paper.\n\nPlease generate:\n1. A client brief scenario for a local stakeholder or business.\n2. An executive presentation format replacing the term paper.\n3. A rubric assessing practical viability and stakeholder communication.`,
-            exemplars: {
-              stem: { slo: "Analyze real municipal water quality datasets to identify contamination trends.", activity: "Data processing lab using real municipal data.", deliverable: "Technical data report.", ulos: [1, 2] },
-              nonStem: { slo: "Formulate a marketing plan for a real small business based on published market research.", activity: "Applied marketing plan development.", deliverable: "Formatted business proposal.", ulos: [2, 3] },
-              coCurricular: { slo: "Design a student wellness event addressing verified campus survey needs.", activity: "Event planning committee project.", deliverable: "Event proposal & budget.", ulos: [4, 7] }
-            }
-          },
-          3: {
-            title: "Advanced / Integrated (Level 3)",
-            descriptor: "Students address authentic, unscripted problems for real clients, partners, or public audiences where outcomes have real consequences.",
-            recommendation: "Establish long-term community partnerships and client pitch events for student capstone projects.",
-            aiPrompt: `Act as a Service-Learning Director. I teach [Insert Course Name].\n\nHelp me design a client-facing capstone project framework.\n\nPlease generate:\n1. A Memorandum of Understanding outline for community partners.\n2. A client feedback rubric.\n3. A student ethical engagement code for real-world field work.`,
-            exemplars: {
-              stem: { slo: "Engineer, deploy, and test an IoT agricultural monitoring network for a local farm client.", activity: "Field-deployed capstone engineering project with real client handover.", deliverable: "Functional deployed system & client operating manual.", ulos: [1, 2, 4, 6] },
-              nonStem: { slo: "Execute a live marketing and PR campaign for a local non-profit client with real advertising budget.", activity: "Client-facing agency consulting project.", deliverable: "Executed campaign & client analytics debrief.", ulos: [2, 3, 4, 6] },
-              coCurricular: { slo: "Direct an active crisis response or campus service initiative delivering real community aid.", activity: "Live leadership execution in service project.", deliverable: "Audited service impact report & client testimonial.", ulos: [4, 6, 7] }
-            }
-          }
-        }
-      },
-      {
-        id: 7,
-        quadrant: 'D',
-        name: "Public Demonstration of Competence",
-        shortName: "Public Demonstration",
-        tamuUlo: [3, 4], // 3: Communicate, 4: Personal Responsibility
-        tiers: {
-          1: {
-            title: "Foundational (Level 1)",
-            descriptor: "Student work is submitted privately to instructor and seen by no one else.",
-            recommendation: "Elevate internal presentations into a public showcase, digital exhibition, or community partner debrief.",
-            aiPrompt: `Act as an Experiential Learning Coordinator. My students in [Insert Course Name] create [Insert Project Type]. I want to upgrade their final presentation into a public demonstration of competence for [Insert Target Audience, e.g., campus community, local non-profits, industry professionals].\n\nPlease generate:\n1. An event structure outline for a 60-minute digital or live showcase (e.g., Interactive Poster Session, Lightning Pitch Showcase).\n2. A student prep guide explaining how to communicate complex technical work to a non-specialist audience in under 3 minutes.\n3. An external evaluator/audience feedback card template (3 brief questions) for guests to provide constructive notes.`,
-            exemplars: {
-              stem: { slo: "Submit final lab reports directly via LMS dropboxes.", activity: "Private submission to instructor.", deliverable: "Graded PDF report.", ulos: [1] },
-              nonStem: { slo: "Submit term research paper via online portal.", activity: "Private paper grading.", deliverable: "Graded term paper.", ulos: [3] },
-              coCurricular: { slo: "Submit internal activity reports to student organization advisor.", activity: "Internal document review.", deliverable: "Activity report.", ulos: [4] }
-            }
-          },
-          2: {
-            title: "Developing / Applied (Level 2)",
-            descriptor: "Work is presented to classmates during class time, but does not extend beyond classroom walls or to external audiences.",
-            recommendation: "Publish student deliverables to a public course website, ePortfolio repository, or campus symposium.",
-            aiPrompt: `Act as a Digital Pedagogy Consultant. I teach [Insert Course Name]. Students present projects in class, but work ends there.\n\nPlease generate:\n1. A digital showcase plan (e.g., ePortfolio/website gallery).\n2. A copyright and public work permission form template.\n3. A rubric for public digital scholarship and visual presentation.`,
-            exemplars: {
-              stem: { slo: "Present technical research findings to classmates via PowerPoint slide decks.", activity: "In-class student presentations.", deliverable: "Presentation slides & oral delivery.", ulos: [3] },
-              nonStem: { slo: "Debate economic policy proposals in front of class peers and invited department faculty.", activity: "In-class formal debate series.", deliverable: "Oral debate defense.", ulos: [2, 3] },
-              coCurricular: { slo: "Present annual organization budget requests to the student government committee.", activity: "Formal committee hearing presentation.", deliverable: "Budget pitch deck.", ulos: [3, 4] }
-            }
-          },
-          3: {
-            title: "Advanced / Integrated (Level 3)",
-            descriptor: "Students defend, exhibit, or publish work to external professionals, community stakeholders, or broader public audiences.",
-            recommendation: "Incorporate formal professional defense panels and external publication pipelines.",
-            aiPrompt: `Act as an Academic Conference Chair. I teach [Insert Course Name].\n\nHelp me design a formal professional jury panel defense for student final work.\n\nPlease generate:\n1. A panel defense schedule and protocol.\n2. Evaluation rubrics for industry judges.\n3. A student defense preparation guide.`,
-            exemplars: {
-              stem: { slo: "Defend capstone engineering designs before a panel of licensed professional engineers (PEs) and industry sponsors.", activity: "Public capstone industry showcase and formal jury defense.", deliverable: "Public poster defense & professional jury scorecard.", ulos: [1, 3, 4] },
-              nonStem: { slo: "Publish business case studies to an open-access repository and present strategy pitches to board executives.", activity: "Public symposium presentation and open digital publication.", deliverable: "Published whitepaper & live board pitch.", ulos: [3, 4, 6] },
-              coCurricular: { slo: "Defend community grant outcomes before local civic leaders and city council representatives.", activity: "Public civic council defense hearing.", deliverable: "Public testimony & published community impact report.", ulos: [3, 4, 5] }
-            }
-          }
-        }
-      },
-      {
-        id: 8,
-        quadrant: 'D',
-        name: "Structured Reflection and Integration",
-        shortName: "Reflection & Integration",
-        tamuUlo: [2, 6], // 2: Critical Thinking, 6: Lifelong Learning
-        tiers: {
-          1: {
-            title: "Foundational (Level 1)",
-            descriptor: "Reflection is informal or limited to end-of-semester course evaluations without guided connections to prior learning.",
-            recommendation: "Embed structured, integrative reflective prompts at key learning milestones using established reflection frameworks (e.g., DEAL model).",
-            aiPrompt: `Act as a High-Impact Practice (HIP) Specialist in Integrative Learning. I teach [Insert Course Name]. I want to implement structured reflection to help students connect course concepts to their personal goals and other academic courses.\n\nHelp me design a 3-part reflective learning log sequence based on the DEAL Model (Describe, Examine, Articulate Learning).\n\nPlease generate:\n1. Three distinct, guided prompts for the beginning, middle, and end of the semester.\n2. A 150-word student-facing overview explaining the cognitive value of integrative reflection.\n3. A simple Pass/Needs Revision grading rubric focused on depth of reflection rather than writing mechanics.`,
-            exemplars: {
-              stem: { slo: "Complete standard student course evaluations (eVALUsate) at term end.", activity: "End-of-term survey.", deliverable: "Course evaluation response.", ulos: [6] },
-              nonStem: { slo: "Write a brief 1-paragraph summary of what was learned in the course.", activity: "Unstructured exit reflection.", deliverable: "Short exit paragraph.", ulos: [6] },
-              coCurricular: { slo: "Complete a basic event check-out survey.", activity: "Exit survey.", deliverable: "Survey response.", ulos: [6] }
-            }
-          },
-          2: {
-            title: "Developing / Applied (Level 2)",
-            descriptor: "Reflection occurs at end of major projects, but focuses primarily on self-assessment of performance rather than synthesizing learning across courses.",
-            recommendation: "Incorporate cross-curricular synthesis prompts connecting current learning to past coursework and future career aims.",
-            aiPrompt: `Act as an Integrative Pedagogy Expert. I teach [Insert Course Name]. Students write post-project reflections, but focus only on what went wrong/right.\n\nPlease generate:\n1. Three synthesis prompts connecting course theory to other discipline courses.\n2. An ePortfolio entry prompt linking project artifacts to career competencies.\n3. A rubric for integrative cognitive complexity.`,
-            exemplars: {
-              stem: { slo: "Evaluate personal technical performance and team dynamics following major lab projects.", activity: "Post-project debrief reflection prompts.", deliverable: "Technical self-assessment journal.", ulos: [2, 6] },
-              nonStem: { slo: "Connect theoretical economic models to personal career aspirations and past internship experiences.", activity: "Structured reflective essay using the DEAL model.", deliverable: "Integrative reflection essay.", ulos: [2, 6] },
-              coCurricular: { slo: "Articulate leadership growth and skill acquisition relative to NACE career readiness competencies.", activity: "Competency mapping reflection workshop.", deliverable: "Career readiness reflection log.", ulos: [4, 6] }
-            }
-          },
-          3: {
-            title: "Advanced / Integrated (Level 3)",
-            descriptor: "Reflection is continuous, cumulative, and integrative (e.g., ePortfolios), requiring students to explicitly synthesize knowledge across domains.",
-            recommendation: "Develop a program-wide ePortfolio strategy where students curate and defend integrative growth over multiple years.",
-            aiPrompt: `Act as an ePortfolio & Integrative Learning Director. I lead [Insert Program/Course].\n\nHelp me design a comprehensive capstone ePortfolio reflection architecture.\n\nPlease generate:\n1. A multi-section ePortfolio outline.\n2. Guiding reflective synthesis prompts for each section.\n3. An institutional VALUE rubric for Integrative Learning assessment.`,
-            exemplars: {
-              stem: { slo: "Curate a digital ePortfolio synthesizing scientific research growth across 4 years, connecting lab work to ethical implications.", activity: "Multi-year ePortfolio curation and oral defense.", deliverable: "Comprehensive scientific ePortfolio & synoptic defense.", ulos: [1, 2, 4, 6] },
-              nonStem: { slo: "Synthesize learning across major coursework, internships, and study abroad into an integrative professional narrative.", activity: "Capstone ePortfolio synthesis and public presentation.", deliverable: "Integrative digital portfolio & career synthesis essay.", ulos: [2, 3, 5, 6] },
-              coCurricular: { slo: "Synthesize co-curricular leadership achievements with academic learning to articulate a personal philosophy of civic engagement.", activity: "Senior leadership capstone defense and ePortfolio defense.", deliverable: "Civic leadership ePortfolio & philosophy monograph.", ulos: [4, 5, 6, 7] }
-            }
-          }
-        }
+        ]
       }
     ];
 
-    const tamuUloNames = {
-      1: "Master Depth of Knowledge",
-      2: "Demonstrate Critical Thinking",
-      3: "Communicate Effectively",
-      4: "Practice Personal & Social Responsibility",
-      5: "Demonstrate Social, Cultural & Global Competence",
-      6: "Prepare to Engage in Lifelong Learning",
-      7: "Work Collaboratively"
+    // DATA MATRIX STRICTLY FROM SECOND SNIPPET (HIPs FIDELITY DIAGNOSTIC TOOL)
+    const hipsData = [
+      {
+        quadrantId: "A",
+        quadrantTitle: "Quadrant A: Engagement",
+        badgeColor: "bg-indigo-100 text-indigo-800 border-indigo-200",
+        borderColor: "border-indigo-500",
+        dimensions: [
+          {
+            id: "interactions",
+            shortName: "Interactions",
+            name: "Interactions (Faculty/Peer)",
+            rationale: "Social Capital ROI: Measures the density of mentorship. Higher interaction scores predict higher alumni engagement and post-grad success.",
+            tiers: {
+              1: {
+                title: "Level 1: Foundational",
+                descriptor: "Faculty-led modeling; peers provide introductory feedback based on provided checklists.",
+                approaches: [
+                  "Provide structured peer review rubrics and checklists for early draft evaluations.",
+                  "Host short instructor-led modeling sessions demonstrating effective peer feedback.",
+                  "Schedule mandatory 5-minute mid-semester check-ins with each student."
+                ]
+              },
+              2: {
+                title: "Level 2: Applied",
+                descriptor: "Iterative collaboration; peers provide formative critique; faculty acts as a 'Consultant.'",
+                approaches: [
+                  "Transition faculty role from lecturer to project consultant during dedicated studio/lab time.",
+                  "Implement multi-stage peer critique loops with required revision response memos.",
+                  "Establish structured team roles (e.g., project manager, lead analyst) for group projects."
+                ]
+              },
+              3: {
+                title: "Level 3: Integrated",
+                descriptor: "Sustained partnership; students and faculty/partners co-author or co-design the final product.",
+                approaches: [
+                  "Co-design semester projects or research papers for co-authorship or conference submission.",
+                  "Integrate community/industry mentors as active co-instructors and reviewers.",
+                  "Establish regular bi-weekly project steering meetings with external partners."
+                ]
+              }
+            }
+          },
+          {
+            id: "feedback",
+            shortName: "Iterative Feedback",
+            name: "Iterative Feedback",
+            rationale: "Efficiency Math: Formative feedback reduces 'D-F-W' (Drop/Fail/Withdraw) rates by catching learning gaps before the final assessment.",
+            tiers: {
+              1: {
+                title: "Level 1: Foundational",
+                descriptor: "Feedback focuses on accuracy, alignment with models, and basic skill acquisition.",
+                approaches: [
+                  "Use auto-graded formative quizzes and structured skill-building exercises.",
+                  "Provide model solutions and self-assessment checklists immediately after submission.",
+                  "Offer early low-stakes feedback on core foundational terminology and mechanics."
+                ]
+              },
+              2: {
+                title: "Level 2: Applied",
+                descriptor: "Feedback focuses on the application of theory to practice and the quality of revisions.",
+                approaches: [
+                  "Require draft-and-resubmit workflows where students submit a revision tracking sheet.",
+                  "Focus instructor feedback on how effectively students translate course theory to practical scenarios.",
+                  "Conduct mid-point project reviews evaluating how prior feedback was incorporated."
+                ]
+              },
+              3: {
+                title: "Level 3: Integrated",
+                descriptor: "Feedback focuses on the impact, professional ethics, and public reach of the final work.",
+                approaches: [
+                  "Engage external professional panels to evaluate work against real-world ethical and market impact standards.",
+                  "Structure feedback sessions around client deliverables and public-facing standards.",
+                  "Require students to justify design and analytical choices in an executive defense."
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        quadrantId: "B",
+        quadrantTitle: "Quadrant B: Challenge & Rigor",
+        badgeColor: "bg-amber-100 text-amber-800 border-amber-200",
+        borderColor: "border-amber-500",
+        dimensions: [
+          {
+            id: "time_effort",
+            shortName: "Time & Effort",
+            name: "Time & Effort",
+            rationale: "Retention Math: Research shows a direct correlation between 'time on task' in HIPs and student retention/graduation rates.",
+            tiers: {
+              1: {
+                title: "Level 1: Foundational",
+                descriptor: "Consistent engagement with the HIP over a term (e.g. <20 hours of engagement); focus on establishing work-flow and habits.",
+                approaches: [
+                  "Set weekly micro-milestones to build regular study and project workflows.",
+                  "Incorporate structured time-tracking logs for out-of-class engagement.",
+                  "Design 2-3 short, progressive activities distributed evenly across the semester."
+                ]
+              },
+              2: {
+                title: "Level 2: Applied",
+                descriptor: "Sustained intensity; significant out-of-class time (e.g. 40-80 hours) dedicated to iterative project development.",
+                approaches: [
+                  "Scaffold major term deliverables across 4 key phases (Proposal, Draft, Revision, Final Submission).",
+                  "Require dedicated out-of-class field work, lab testing, or client meetings.",
+                  "Utilize project management tracking boards (e.g., Trello or Kanban) for group accountability."
+                ]
+              },
+              3: {
+                title: "Level 3: Integrated",
+                descriptor: "Deep, immersive investment (e.g. 100+ hours of engagement); students manage complex timelines and competing priorities.",
+                approaches: [
+                  "Structure capstone or multi-term projects requiring 100+ hours of dedicated effort.",
+                  "Implement professional sprint planning and student-managed project Gantt charts.",
+                  "Incorporate real-world resource allocation and contingency planning into project management."
+                ]
+              }
+            }
+          },
+          {
+            id: "performance_expectations",
+            shortName: "Performance Expectations",
+            name: "Performance Expectations",
+            rationale: "Audit Defense: Prevents 'HIP-in-name-only' reporting. High expectations ensure the value of the TAMU degree remains gold-standard in state audits.",
+            tiers: {
+              1: {
+                title: "Level 1: Foundational",
+                descriptor: "Students identify and follow modeled professional standards to complete structured tasks.",
+                approaches: [
+                  "Provide explicit high-scoring work exemplars alongside assignment rubrics.",
+                  "Break standard operating procedures into step-by-step technical guides.",
+                  "Assess students on their ability to replicate industry standards accurately."
+                ]
+              },
+              2: {
+                title: "Level 2: Applied",
+                descriptor: "Students apply standards to solve semi-structured problems with increasing autonomy.",
+                approaches: [
+                  "Present real-world case studies with missing parameters that require decision-making.",
+                  "Require students to select and defend appropriate analytical methodologies.",
+                  "Use multi-criteria professional rubrics with rubric self-evaluations before grading."
+                ]
+              },
+              3: {
+                title: "Level 3: Integrated",
+                descriptor: "Students negotiate/define the standards and criteria for original, unscripted outcomes.",
+                approaches: [
+                  "Have students co-create project rubrics and success metrics directly with client stakeholders.",
+                  "Assign open-ended, unscripted industry challenges without pre-determined outcomes.",
+                  "Require students to conduct a formal professional audit and defense of their final deliverables."
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        quadrantId: "C",
+        quadrantTitle: "Quadrant C: Integration",
+        badgeColor: "bg-emerald-100 text-emerald-800 border-emerald-200",
+        borderColor: "border-emerald-500",
+        dimensions: [
+          {
+            id: "diversity",
+            shortName: "Experiences with Diversity",
+            name: "Experiences with Diversity",
+            rationale: "Market Readiness: Employers prioritize 'cultural competence.' This cell measures the university's success in preparing students for global markets.",
+            tiers: {
+              1: {
+                title: "Level 1: Foundational",
+                descriptor: "Exposure to diverse perspectives through guided readings, guest speakers, or initial contact.",
+                approaches: [
+                  "Incorporate guest lectures from diverse industry experts and international practitioners.",
+                  "Assign comparative readings exploring global or non-traditional disciplinary perspectives.",
+                  "Facilitate structured classroom discussions analyzing cultural bias in problem-solving."
+                ]
+              },
+              2: {
+                title: "Level 2: Applied",
+                descriptor: "Engagement with 'otherness' through project-based work; students navigate differing viewpoints.",
+                approaches: [
+                  "Design team projects that require cross-disciplinary or cross-cultural collaboration.",
+                  "Assign case studies requiring students to address differing community stakeholder interests.",
+                  "Incorporate structured cross-cultural communication workshops into the project schedule."
+                ]
+              },
+              3: {
+                title: "Level 3: Integrated",
+                descriptor: "Transformation through sustained, direct engagement in unfamiliar or complex environments.",
+                approaches: [
+                  "Embed immersive service-learning or Collaborative Online International Learning (COIL) projects.",
+                  "Require direct, extended fieldwork within unfamiliar civic or community environments.",
+                  "Assess students on adaptive leadership and equitable community-engaged practice."
+                ]
+              }
+            }
+          },
+          {
+            id: "reflection",
+            shortName: "Structured Reflection",
+            name: "Structured Reflection",
+            rationale: "The 'Learning Engine': Converts activity into portable skills. Without reflection, the 'Impact' is lost once the semester ends.",
+            tiers: {
+              1: {
+                title: "Level 1: Foundational",
+                descriptor: "Descriptive: 'How does this experience match what I am learning in the classroom?'",
+                approaches: [
+                  "Implement prompt-driven reflection journals connecting weekly readings to practical tasks.",
+                  "Use the DEAL Model (Describe, Examine, Articulate Learning) for short post-activity write-ups.",
+                  "Include short reflection questions at the end of homework assignments."
+                ]
+              },
+              2: {
+                title: "Level 2: Applied",
+                descriptor: "Integrative: 'How am I adapting my skills to meet the specific needs of this context?'",
+                approaches: [
+                  "Assign critical reflection essays analyzing where theory held true or failed in practical application.",
+                  "Require progress logs where students document adaptation to unexpected project hurdles.",
+                  "Utilize structured STAR (Situation, Task, Action, Result) competency narratives."
+                ]
+              },
+              3: {
+                title: "Level 3: Integrated",
+                descriptor: "Metacognitive: 'How has this partnership redefined my professional identity and values?'",
+                approaches: [
+                  "Implement cumulative ePortfolios synthesizing learning across multiple courses and experience.",
+                  "Require a comprehensive capstone reflection defense focusing on ethical and professional identity.",
+                  "Guide students in articulating portable career readiness competencies for job markets."
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        quadrantId: "D",
+        quadrantTitle: "Quadrant D: Impact",
+        badgeColor: "bg-sky-100 text-sky-800 border-sky-200",
+        borderColor: "border-sky-500",
+        dimensions: [
+          {
+            id: "real_world",
+            shortName: "Real-World Application",
+            name: "Real-World Application",
+            rationale: "External Brand Value: Measures the university's impact on the community. High scores here justify state and private donor funding.",
+            tiers: {
+              1: {
+                title: "Level 1: Foundational",
+                descriptor: "Hypothetical or 'simulated' real-world scenarios; low-stakes external connection.",
+                approaches: [
+                  "Use realistic industry datasets or simulated business case studies for assignments.",
+                  "Format standard assignments as professional industry documents (e.g., policy memos, client briefs).",
+                  "Incorporate simulated role-play scenarios to practice professional problem solving."
+                ]
+              },
+              2: {
+                title: "Level 2: Applied",
+                descriptor: "Active projects with a live stakeholder; solving a defined problem with real consequences.",
+                approaches: [
+                  "Partner with a local organization or campus unit to solve a specific, defined operational challenge.",
+                  "Deliver actionable products (e.g., market analyses, designs, tools) directly to external partners.",
+                  "Draft formal memorandum of understanding (MOU) scope documents with community clients."
+                ]
+              },
+              3: {
+                title: "Level 3: Integrated",
+                descriptor: "Unscripted partnership; students navigate the ambiguity of a 'live' professional/civic ecosystem.",
+                approaches: [
+                  "Engage students in long-term, unscripted community co-design projects with real civic stakes.",
+                  "Manage live partner relations where project specifications evolve dynamically over time.",
+                  "Deliver complete, transition-ready products with handoff manuals and client implementation plans."
+                ]
+              }
+            }
+          },
+          {
+            id: "public_demonstration",
+            shortName: "Public Demonstration",
+            name: "Public Demonstration",
+            rationale: "Accountability: Makes the hidden work of the university 'visible.' Public competence is the ultimate proof of institutional quality.",
+            tiers: {
+              1: {
+                title: "Level 1: Foundational",
+                descriptor: "Presentation to peers/faculty to demonstrate baseline competence and communication.",
+                approaches: [
+                  "Schedule mandatory end-of-unit student presentations before classmates and course instructor.",
+                  "Use standardized oral communication rubrics with active peer evaluation.",
+                  "Create digital project gallery walks within the learning management system (LMS)."
+                ]
+              },
+              2: {
+                title: "Level 2: Applied",
+                descriptor: "Presentation to a community partner or specific stakeholder for feedback and critique.",
+                approaches: [
+                  "Host a formal end-of-semester presentation session with community clients and partners.",
+                  "Submit project proposals or deliverables to campus/department showcases or poster sessions.",
+                  "Incorporate live Q&A sessions with stakeholder panels as part of project grading."
+                ]
+              },
+              3: {
+                title: "Level 3: Integrated",
+                descriptor: "Public defense/dissemination to an external body with the intent to influence practice or policy.",
+                approaches: [
+                  "Organize a public symposium, industry pitch, or external panel defense with guest evaluators.",
+                  "Publish student deliverables to open-access research repositories or public media outlets.",
+                  "Present policy recommendations directly to municipal boards or professional associations."
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ];
+
+    // State for Self-Diagnostic Tool
+    const scores = {
+      interactions: 0,
+      feedback: 0,
+      time_effort: 0,
+      performance_expectations: 0,
+      diversity: 0,
+      reflection: 0,
+      real_world: 0,
+      public_demonstration: 0
     };
 
-    // Global State Application Object
-    let state = {
-      currentTab: 'radar',
-      scores: { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1 },
-      activeTrack: 'stem', // 'stem', 'non-stem', 'co-curricular'
-      inspectedDimId: 1
-    };
-
+    let activeDrawerDimension = null;
     let chartInstance = null;
+    let currentModalExemplars = [];
 
-    // Initialize Master Suite
     document.addEventListener('DOMContentLoaded', () => {
-      renderRadarMatrixForm();
-      initRadarChart();
-      renderFidelityMatrix();
+      renderMatrix();
+      renderQuadrants();
       populateBuilderDropdowns();
-      generateSyllabusOutput();
-      setupEventListeners();
+      updateBuilderExemplars();
+      initChart();
+      updateScoreSummary();
+      lucide.createIcons();
     });
 
-    // Tab Navigation Switcher
-    function switchTab(tabId) {
-      state.currentTab = tabId;
-      ['radar', 'matrix', 'syllabus'].forEach(t => {
-        const view = document.getElementById(`tabView-${t}`);
-        const nav = document.getElementById(`tabNav-${t}`);
-        if (t === tabId) {
-          view.classList.remove('hidden');
-          nav.classList.add('tab-active');
-        } else {
-          view.classList.add('hidden');
-          nav.classList.remove('tab-active');
-        }
-      });
+    function switchMainTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
 
-      if (tabId === 'radar' && chartInstance) {
-        chartInstance.update();
+      document.getElementById(tabId).classList.add('active');
+      const activeBtn = Array.from(document.querySelectorAll('.nav-tab')).find(btn => 
+        btn.getAttribute('onclick').includes(tabId)
+      );
+      if (activeBtn) activeBtn.classList.add('active');
+
+      if (tabId === 'diagnosticTab' && chartInstance) {
+        setTimeout(() => { chartInstance.update(); }, 50);
       }
     }
 
-    // ==========================================
-    // TAB 1 LOGIC: RADAR DIAGNOSTIC & AI DRAWER
-    // ==========================================
-    function renderRadarMatrixForm() {
-      const container = document.getElementById('dimensionsList');
-      container.innerHTML = '';
+    /* MATRIX FUNCTIONS */
+    function renderMatrix() {
+      const container = document.getElementById('matrixContainer');
+      let html = `
+        <div class="grid-header">AAC&U Quality Element</div>
+        <div class="grid-header">Foundational</div>
+        <div class="grid-header">Applied</div>
+        <div class="grid-header">Integrated</div>
+      `;
 
-      dimensionsData.forEach(dim => {
-        const currentLevel = state.scores[dim.id];
-        
-        const card = document.createElement('div');
-        card.className = "p-4 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-lg transition space-y-3 cursor-pointer";
-        card.onclick = (e) => {
-          if(!e.target.closest('input')) {
-            openDrawer(dim.id);
-          }
-        };
-
-        card.innerHTML = `
-          <div class="flex justify-between items-start gap-2">
-            <div>
-              <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">Dimension ${dim.id} • Quadrant ${dim.quadrant}</span>
-              <h3 class="text-sm font-bold text-slate-800 mt-1">${dim.name}</h3>
+      matrixData.forEach(q => {
+        html += `<div class="quadrant-row-header">${q.quadrant}</div>`;
+        q.elements.forEach(elem => {
+          html += `
+            <div class="element-title-cell">
+              <h3>${elem.title}</h3>
+              <p><strong>Rationale:</strong> ${elem.rationale}</p>
             </div>
-            <button onclick="openDrawer(${dim.id}); event.stopPropagation();" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 bg-white px-2 py-1 rounded border border-slate-200 shadow-sm">
-              Inspect AI Prompts <i class="fa-solid fa-chevron-right text-[10px]"></i>
-            </button>
-          </div>
+          `;
 
-          <div class="grid grid-cols-3 gap-2 pt-1">
-            ${[1, 2, 3].map(levelNum => `
-              <label class="flex items-center justify-center p-2 rounded border text-xs font-medium cursor-pointer transition select-none ${
-                currentLevel === levelNum 
-                  ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' 
-                  : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
-              }">
-                <input type="radio" name="dim_${dim.id}" value="${levelNum}" ${currentLevel === levelNum ? 'checked' : ''} 
-                       onchange="updateScore(${dim.id},${levelNum})" class="sr-only">
-                Level ${levelNum}
-              </label>
-            `).join('')}
+          ['foundational', 'applied', 'integrated'].forEach(scope => {
+            const tierData = elem.tiers[scope];
+            html += `
+              <div class="matrix-cell">
+                <div class="cell-desc">${tierData.desc}</div>
+                <div class="track-triggers">
+                  <button class="track-btn stem-btn" onclick="openModal('${elem.id}', '${scope}', 'stem')">
+                    <span>STEM Exemplars</span>
+                    <span>→</span>
+                  </button>
+                  <button class="track-btn nonstem-btn" onclick="openModal('${elem.id}', '${scope}', 'nonstem')">
+                    <span>Non-STEM Exemplars</span>
+                    <span>→</span>
+                  </button>
+                  <button class="track-btn cocurricular-btn" onclick="openModal('${elem.id}', '${scope}', 'cocurricular')">
+                    <span>Co-Curricular Exemplars</span>
+                    <span>→</span>
+                  </button>
+                </div>
+              </div>
+            `;
+          });
+        });
+      });
+
+      container.innerHTML = html;
+    }
+
+    function openModal(elementId, scope, track) {
+      let foundElem = null;
+      let quadrantTitle = "";
+
+      for (const q of matrixData) {
+        const match = q.elements.find(e => e.id === elementId);
+        if (match) {
+          foundElem = match;
+          quadrantTitle = q.quadrant;
+          break;
+        }
+      }
+
+      if (!foundElem) return;
+
+      const scopeTitle = scope.charAt(0).toUpperCase() + scope.slice(1);
+      const trackLabel = track === 'stem' ? 'STEM Track' : track === 'nonstem' ? 'Non-STEM Track' : 'Co-Curricular Track';
+      currentModalExemplars = foundElem.tiers[scope].exemplars[track];
+
+      document.getElementById('modalTitle').textContent = foundElem.title;
+      document.getElementById('modalSubtitle').textContent = `${quadrantTitle} | ${scopeTitle} Level | ${trackLabel}`;
+
+      const tabsContainer = document.getElementById('modalExemplarTabs');
+      let tabsHtml = "";
+      currentModalExemplars.forEach((ex, idx) => {
+        tabsHtml += `<button class="ex-tab-btn ${idx === 0 ? 'active' : ''}" onclick="switchModalExemplarTab(${idx})">${ex.discipline}</button>`;
+      });
+      tabsContainer.innerHTML = tabsHtml;
+
+      renderModalExemplarContent(0);
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function switchModalExemplarTab(idx) {
+      document.querySelectorAll('.ex-tab-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', i === idx);
+      });
+      renderModalExemplarContent(idx);
+    }
+
+    function renderModalExemplarContent(idx) {
+      const ex = currentModalExemplars[idx];
+      if (!ex) return;
+
+      let ulosHtml = ex.ulos.map(u => `<span class="ulo-badge">${TAMU_ULOS[u] || u}</span>`).join('');
+
+      const html = `
+        <div class="package-card">
+          <div class="package-header">
+            <span class="discipline-label">${ex.discipline}</span>
+          </div>
+          <div class="data-group">
+            <span class="data-title">Target Student Learning Outcome (SLO)</span>
+            <div class="data-body">${ex.outcome}</div>
+          </div>
+          <div class="data-group">
+            <span class="data-title">Aligned Experiential Learning Activity</span>
+            <div class="data-body">${ex.activity}</div>
+          </div>
+          <div class="data-group">
+            <span class="data-title">Direct Assessment Mechanism</span>
+            <div class="data-body">${ex.assessment}</div>
+          </div>
+          <div class="data-group">
+            <span class="data-title">Mapped TEXAS A&M Undergraduate Learning Outcomes (ULOs)</span>
+            <div class="ulo-container">${ulosHtml}</div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('modalExemplarContent').innerHTML = html;
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    function handleOverlayClick(event) {
+      if (event.target.id === 'modalOverlay') {
+        closeModal();
+      }
+    }
+
+    /* SELF-DIAGNOSTIC & RADAR FUNCTIONS (FROM SECOND SNIPPET) */
+    function renderQuadrants() {
+      const container = document.getElementById("quadrantsContainer");
+      container.innerHTML = "";
+
+      hipsData.forEach(q => {
+        const qCard = document.createElement("div");
+        qCard.className = `bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden`;
+
+        let dimensionsHtml = "";
+        q.dimensions.forEach(dim => {
+          dimensionsHtml += `
+            <div class="p-4 border-t border-slate-100 first:border-t-0 space-y-3">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h4 class="font-bold text-slate-800 text-sm flex items-center gap-1.5 m-0">
+                    ${dim.name}
+                  </h4>
+                  <p class="text-xs text-slate-500 mt-0.5 mb-0 line-clamp-1">${dim.rationale}</p>
+                </div>
+              </div>
+
+              <!-- Level Selection Buttons -->
+              <div class="grid grid-cols-4 gap-2">
+                <button onclick="setScoreAndOpen('${dim.id}', 0)" id="btn-${dim.id}-0"
+                  class="score-btn py-2 px-1 text-center rounded-lg border text-xs font-semibold transition-all bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer">
+                  Level 0<br><span class="text-[10px] font-normal text-slate-400">None</span>
+                </button>
+                <button onclick="setScoreAndOpen('${dim.id}', 1)" id="btn-${dim.id}-1"
+                  class="score-btn py-2 px-1 text-center rounded-lg border text-xs font-semibold transition-all bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer">
+                  Level 1<br><span class="text-[10px] font-normal text-slate-400">Foundational</span>
+                </button>
+                <button onclick="setScoreAndOpen('${dim.id}', 2)" id="btn-${dim.id}-2"
+                  class="score-btn py-2 px-1 text-center rounded-lg border text-xs font-semibold transition-all bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer">
+                  Level 2<br><span class="text-[10px] font-normal text-slate-400">Applied</span>
+                </button>
+                <button onclick="setScoreAndOpen('${dim.id}', 3)" id="btn-${dim.id}-3"
+                  class="score-btn py-2 px-1 text-center rounded-lg border text-xs font-semibold transition-all bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer">
+                  Level 3<br><span class="text-[10px] font-normal text-slate-400">Integrated</span>
+                </button>
+              </div>
+            </div>
+          `;
+        });
+
+        qCard.innerHTML = `
+          <div class="px-5 py-3 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
+            <span class="font-bold text-xs uppercase tracking-wider text-slate-700">${q.quadrantTitle}</span>
+            <span class="text-[11px] font-semibold px-2 py-0.5 rounded ${q.badgeColor}">${q.dimensions.length} Dimensions</span>
+          </div>
+          <div class="divide-y divide-slate-100">
+            ${dimensionsHtml}
           </div>
         `;
-        container.appendChild(card);
+        container.appendChild(qCard);
       });
 
-      updateMetrics();
+      updateButtonStyles();
     }
 
-    function updateScore(dimId, level) {
-      state.scores[dimId] = parseInt(level);
-      renderRadarMatrixForm();
+    function setScore(dimId, level) {
+      scores[dimId] = level;
+      updateButtonStyles();
       updateChart();
-      renderFidelityMatrix();
-      
-      // Update Builder selects if needed
-      document.getElementById('builderLevelSelect').value = state.scores[document.getElementById('builderElementSelect').value];
-      generateSyllabusOutput();
-
-      if (!document.getElementById('actionDrawer').classList.contains('translate-x-full') && state.inspectedDimId === dimId) {
-        populateDrawer(dimId);
-      }
+      updateScoreSummary();
     }
 
-    function updateMetrics() {
-      const totalScore = Object.values(state.scores).reduce((a, b) => a + b, 0);
-      document.getElementById('totalScoreText').innerText = `${totalScore} / 24`;
-      
-      const percentage = (totalScore / 24) * 100;
-      document.getElementById('scoreProgressBar').style.width = `${percentage}%`;
+    function setScoreAndOpen(dimId, level) {
+      setScore(dimId, level);
+      openDrawer(dimId, level === 0 ? 1 : level);
+    }
 
-      const badge = document.getElementById('overallLevelBadge');
-      if (totalScore <= 11) {
-        badge.innerText = "Foundational HIP Course";
-        badge.className = "font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-100";
-      } else if (totalScore <= 18) {
-        badge.innerText = "Applied / Scaffolded HIP";
-        badge.className = "font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100";
+    function updateButtonStyles() {
+      hipsData.forEach(q => {
+        q.dimensions.forEach(dim => {
+          const currentLevel = scores[dim.id];
+          for (let l = 0; l <= 3; l++) {
+            const btn = document.getElementById(`btn-${dim.id}-${l}`);
+            if (!btn) continue;
+            if (l === currentLevel) {
+              btn.className = "score-btn py-2 px-1 text-center rounded-lg border text-xs font-bold transition-all bg-slate-900 border-slate-900 text-white shadow-sm ring-2 ring-slate-900/20 cursor-pointer";
+            } else {
+              btn.className = "score-btn py-2 px-1 text-center rounded-lg border text-xs font-semibold transition-all bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer";
+            }
+          }
+        });
+      });
+    }
+
+    function updateScoreSummary() {
+      const total = Object.values(scores).reduce((a, b) => a + b, 0);
+      document.getElementById("totalScoreText").innerHTML = `${total} <span class="text-xs font-normal text-slate-400">/ 24</span>`;
+
+      const scopeBadge = document.getElementById("scopeBadge");
+      if (total < 8) {
+        scopeBadge.textContent = "Below Threshold (< 8 pts)";
+        scopeBadge.className = "text-xs font-bold px-2.5 py-1 rounded bg-rose-900/60 text-rose-200 border border-rose-700 mt-0.5 inline-block";
+      } else if (total <= 13) {
+        scopeBadge.textContent = "Scope 1 (Internal / Instructor Safety Net)";
+        scopeBadge.className = "text-xs font-bold px-2.5 py-1 rounded bg-blue-900/60 text-blue-200 border border-blue-700 mt-0.5 inline-block";
+      } else if (total <= 19) {
+        scopeBadge.textContent = "Scope 2 (Campus/Community / Partner Agreement)";
+        scopeBadge.className = "text-xs font-bold px-2.5 py-1 rounded bg-amber-900/60 text-amber-200 border border-amber-700 mt-0.5 inline-block";
       } else {
-        badge.innerText = "Integrated High-Fidelity HIP";
-        badge.className = "font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100";
+        scopeBadge.textContent = "Scope 3 (External / Institutional Protocol)";
+        scopeBadge.className = "text-xs font-bold px-2.5 py-1 rounded bg-emerald-900/60 text-emerald-200 border border-emerald-700 mt-0.5 inline-block";
       }
     }
 
-    function initRadarChart() {
+    function initChart() {
       const ctx = document.getElementById('hipsRadarChart').getContext('2d');
       chartInstance = new Chart(ctx, {
         type: 'radar',
         data: {
-          labels: dimensionsData.map(d => d.shortName),
+          labels: [
+            ['Faculty/Peer', 'Interactions'],
+            ['Iterative', 'Feedback'],
+            ['Time &', 'Effort'],
+            ['Performance', 'Expectations'],
+            ['Experiences w/', 'Diversity'],
+            ['Structured', 'Reflection'],
+            ['Real-World', 'Application'],
+            ['Public', 'Demonstration']
+          ],
           datasets: [{
-            label: 'Current HIP Level',
-            data: dimensionsData.map(d => state.scores[d.id]),
-            backgroundColor: 'rgba(79, 70, 229, 0.2)',
-            borderColor: 'rgba(79, 70, 229, 1)',
+            label: 'HIP Fidelity Level',
+            data: [0, 0, 0, 0, 0, 0, 0, 0],
+            backgroundColor: 'rgba(79, 70, 229, 0.25)',
+            borderColor: 'rgba(79, 70, 229, 0.9)',
             borderWidth: 2,
-            pointBackgroundColor: 'rgba(79, 70, 229, 1)',
+            pointBackgroundColor: '#4f46e5',
             pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#4f46e5',
             pointRadius: 4
           }]
         },
         options: {
           responsive: true,
-          maintainAspectRatio: true,
+          maintainAspectRatio: false,
           scales: {
             r: {
               min: 0,
               max: 3,
-              ticks: { stepSize: 1, display: true, backdropColor: 'transparent' },
-              grid: { color: '#e2e8f0' },
-              angleLines: { color: '#cbd5e1' },
-              pointLabels: { font: { size: 10, weight: '600' }, color: '#334155' }
+              ticks: {
+                stepSize: 1,
+                display: false
+              },
+              pointLabels: {
+                font: {
+                  size: 10,
+                  weight: '600'
+                },
+                color: '#334155'
+              },
+              grid: {
+                color: '#e2e8f0'
+              },
+              angleLines: {
+                color: '#cbd5e1'
+              }
             }
           },
-          plugins: { legend: { display: false } },
-          onClick: (evt, activeElements) => {
-            if (activeElements.length > 0) {
-              const index = activeElements[0].index;
-              openDrawer(dimensionsData[index].id);
+          plugins: {
+            legend: {
+              display: false
             }
           }
         }
@@ -943,273 +1747,183 @@
     }
 
     function updateChart() {
-      if (chartInstance) {
-        chartInstance.data.datasets[0].data = dimensionsData.map(d => state.scores[d.id]);
-        chartInstance.update();
+      if (!chartInstance) return;
+      chartInstance.data.datasets[0].data = [
+        scores.interactions,
+        scores.feedback,
+        scores.time_effort,
+        scores.performance_expectations,
+        scores.diversity,
+        scores.reflection,
+        scores.real_world,
+        scores.public_demonstration
+      ];
+      chartInstance.update();
+    }
+
+    function resetScores() {
+      Object.keys(scores).forEach(k => scores[k] = 0);
+      updateButtonStyles();
+      updateChart();
+      updateScoreSummary();
+      closeDrawer();
+    }
+
+    function openDrawer(dimId, targetLevel = null) {
+      let foundDim = null;
+      let foundQ = null;
+
+      hipsData.forEach(q => {
+        q.dimensions.forEach(d => {
+          if (d.id === dimId) {
+            foundDim = d;
+            foundQ = q;
+          }
+        });
+      });
+
+      if (!foundDim) return;
+      activeDrawerDimension = foundDim;
+
+      const activeLevel = targetLevel || (scores[dimId] === 0 ? 1 : scores[dimId]);
+
+      document.getElementById("drawerQuadrantBadge").textContent = foundQ.quadrantTitle;
+      document.getElementById("drawerTitle").textContent = foundDim.name;
+      document.getElementById("drawerRationale").textContent = foundDim.rationale;
+
+      const selectorContainer = document.getElementById("drawerLevelSelector");
+      selectorContainer.innerHTML = "";
+      for (let l = 1; l <= 3; l++) {
+        const btn = document.createElement("button");
+        btn.onclick = () => {
+          setScore(dimId, l);
+          renderDrawerLevelContent(foundDim, l);
+        };
+        const isActive = (l === scores[dimId]);
+        btn.className = isActive
+          ? "py-2 text-center rounded-lg text-xs font-bold bg-slate-900 text-white border border-slate-900 cursor-pointer"
+          : "py-2 text-center rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 cursor-pointer";
+        btn.innerHTML = `Level ${l}<br><span class="text-[10px] font-normal opacity-80">${l === 1 ? 'Foundational' : l === 2 ? 'Applied' : 'Integrated'}</span>`;
+        selectorContainer.appendChild(btn);
+      }
+
+      renderDrawerLevelContent(foundDim, activeLevel);
+
+      document.getElementById("sideDrawer").classList.remove("translate-x-full");
+      document.getElementById("drawerBackdrop").classList.remove("opacity-0", "pointer-events-none");
+    }
+
+    function renderDrawerLevelContent(dim, level) {
+      const tier = dim.tiers[level];
+      if (!tier) return;
+
+      document.getElementById("drawerLevelBadge").textContent = tier.title;
+      document.getElementById("drawerDescriptor").textContent = tier.descriptor;
+
+      const approachesContainer = document.getElementById("drawerApproaches");
+      approachesContainer.innerHTML = tier.approaches
+        .map(a => `<li class="flex items-start gap-2"><span class="text-amber-500 font-bold">•</span><span>${a}</span></li>`)
+        .join("");
+
+      const selectorContainer = document.getElementById("drawerLevelSelector");
+      if (selectorContainer) {
+        const buttons = selectorContainer.querySelectorAll("button");
+        buttons.forEach((btn, idx) => {
+          const l = idx + 1;
+          const isActive = (l === level);
+          btn.className = isActive
+            ? "py-2 text-center rounded-lg text-xs font-bold bg-slate-900 text-white border border-slate-900 cursor-pointer"
+            : "py-2 text-center rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 cursor-pointer";
+        });
       }
     }
 
-    // Drawer System
-    function openDrawer(dimId) {
-      state.inspectedDimId = dimId;
-      populateDrawer(dimId);
-      
-      document.getElementById('drawerBackdrop').classList.remove('hidden');
-      setTimeout(() => {
-        document.getElementById('drawerBackdrop').classList.remove('opacity-0');
-        document.getElementById('actionDrawer').classList.remove('translate-x-full');
-      }, 10);
-    }
-
     function closeDrawer() {
-      document.getElementById('actionDrawer').classList.add('translate-x-full');
-      document.getElementById('drawerBackdrop').classList.add('opacity-0');
-      setTimeout(() => {
-        document.getElementById('drawerBackdrop').classList.add('hidden');
-      }, 300);
+      document.getElementById("sideDrawer").classList.add("translate-x-full");
+      document.getElementById("drawerBackdrop").classList.add("opacity-0", "pointer-events-none");
     }
 
-    function populateDrawer(dimId) {
-      const dim = dimensionsData.find(d => d.id === dimId);
-      const currentLevel = state.scores[dimId];
-      const levelData = dim.tiers[currentLevel];
-
-      document.getElementById('drawerDimCategory').innerText = `Dimension ${dim.id} • Quadrant ${dim.quadrant}`;
-      document.getElementById('drawerDimTitle').innerText = dim.name;
-      
-      document.getElementById('drawerLevelBadge').innerHTML = `
-        <i class="fa-solid fa-layer-group"></i> Currently Set to: <strong>Level ${currentLevel} (${levelData.title.split(' ')[0]})</strong>
-      `;
-
-      document.getElementById('drawerStatusText').innerText = `${levelData.title}`;
-      document.getElementById('drawerDescriptor').innerText = levelData.descriptor;
-      document.getElementById('drawerRecommendation').innerText = levelData.recommendation;
-      document.getElementById('drawerAiPrompt').innerText = levelData.aiPrompt;
-    }
-
-    // ==========================================
-    // TAB 2 LOGIC: TAMU FIDELITY MATRIX & EXEMPLARS
-    // ==========================================
-    function setTrack(trackKey) {
-      state.activeTrack = trackKey;
-      ['stem', 'non-stem', 'co-curricular'].forEach(t => {
-        const btn = document.getElementById(`trackBtn-${t}`);
-        if (t === trackKey) {
-          btn.className = "px-3 py-1 text-xs font-semibold rounded-md transition bg-white text-indigo-600 shadow-sm";
-        } else {
-          btn.className = "px-3 py-1 text-xs font-semibold rounded-md transition text-slate-600 hover:text-slate-900";
-        }
-      });
-      renderFidelityMatrix();
-      generateSyllabusOutput();
-    }
-
-    function renderFidelityMatrix() {
-      ['A', 'B', 'C', 'D'].forEach(q => {
-        const container = document.getElementById(`quadrant${q}-container`);
-        if(!container) return;
-        container.innerHTML = '';
-
-        const elements = dimensionsData.filter(d => d.quadrant === q);
-        elements.forEach(dim => {
-          const currentLevel = state.scores[dim.id];
-          const levelInfo = dim.tiers[currentLevel];
-          const trackKey = state.activeTrack === 'non-stem' ? 'nonStem' : (state.activeTrack === 'co-curricular' ? 'coCurricular' : 'stem');
-          const exemplar = levelInfo.exemplars[trackKey];
-
-          const elBox = document.createElement('div');
-          elBox.className = "p-3.5 bg-slate-50 rounded-lg border border-slate-200 space-y-2.5";
-          elBox.innerHTML = `
-            <div class="flex justify-between items-start">
-              <div>
-                <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Element ${dim.id}</span>
-                <h4 class="text-xs font-bold text-slate-900">${dim.name}</h4>
-              </div>
-              <span class="text-[10px] font-semibold px-2 py-0.5 bg-indigo-100 text-indigo-800 rounded border border-indigo-200">
-                Level ${currentLevel}
-              </span>
-            </div>
-            
-            <p class="text-[11px] text-slate-600 leading-snug">${levelInfo.descriptor}</p>
-            
-            <div class="pt-2 border-t border-slate-200/60 flex justify-between items-center">
-              <div class="flex gap-1 flex-wrap">
-                ${dim.tamuUlo.map(u => `<span class="text-[9px] font-semibold px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded">ULO ${u}</span>`).join('')}
-              </div>
-              <button onclick="openExemplarModal(${dim.id})" class="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
-                View Exemplar <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
-              </button>
-            </div>
-          `;
-          container.appendChild(elBox);
-        });
-      });
-
-      renderUloBadges();
-    }
-
-    function renderUloBadges() {
-      const activeUloIds = new Set();
-      dimensionsData.forEach(dim => {
-        dim.tamuUlo.forEach(u => activeUloIds.add(u));
-      });
-
-      const container = document.getElementById('uloCoverageBadges');
-      container.innerHTML = '';
-
-      [1, 2, 3, 4, 5, 6, 7].forEach(id => {
-        const isCovered = activeUloIds.has(id);
-        const badge = document.createElement('div');
-        badge.className = `p-2.5 rounded-lg border text-xs font-medium flex items-center gap-2 ${
-          isCovered 
-            ? 'bg-emerald-50 border-emerald-200 text-emerald-900' 
-            : 'bg-slate-50 border-slate-200 text-slate-400 opacity-60'
-        }`;
-        badge.innerHTML = `
-          <i class="fa-solid ${isCovered ? 'fa-circle-check text-emerald-600' : 'fa-circle-xmark text-slate-400'}"></i>
-          <div>
-            <div class="font-bold">ULO ${id}: ${tamuUloNames[id]}</div>
-            <div class="text-[10px] ${isCovered ? 'text-emerald-700' : 'text-slate-400'}">Mapped across course HIP elements</div>
-          </div>
-        `;
-        container.appendChild(badge);
-      });
-    }
-
-    function openExemplarModal(dimId) {
-      const dim = dimensionsData.find(d => d.id === dimId);
-      const level = state.scores[dimId];
-      const levelInfo = dim.tiers[level];
-      const trackKey = state.activeTrack === 'non-stem' ? 'nonStem' : (state.activeTrack === 'co-curricular' ? 'coCurricular' : 'stem');
-      const trackLabel = state.activeTrack === 'non-stem' ? 'Non-STEM / Business' : (state.activeTrack === 'co-curricular' ? 'Co-Curricular' : 'STEM');
-      const ex = levelInfo.exemplars[trackKey];
-
-      document.getElementById('modalElementBadge').innerText = `Element ${dim.id} • ${levelInfo.title}`;
-      document.getElementById('modalTitle').innerText = `${dim.name} (${trackLabel} Perspective)`;
-
-      document.getElementById('modalBody').innerHTML = `
-        <div class="space-y-3">
-          <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-lg">
-            <span class="font-bold text-indigo-900 block text-xs uppercase tracking-wider mb-1">Target Student Learning Outcome (SLO)</span>
-            <p class="text-xs text-indigo-950 font-medium">${ex.slo}</p>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-              <span class="font-bold text-slate-700 block text-[11px] uppercase tracking-wider mb-1">Pedagogical Activity</span>
-              <p class="text-xs text-slate-600">${ex.activity}</p>
-            </div>
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-              <span class="font-bold text-slate-700 block text-[11px] uppercase tracking-wider mb-1">Authentic Deliverable</span>
-              <p class="text-xs text-slate-600">${ex.deliverable}</p>
-            </div>
-          </div>
-
-          <div class="pt-2">
-            <span class="font-bold text-slate-700 block text-[11px] uppercase tracking-wider mb-1.5">Mapped Texas A&M ULOs</span>
-            <div class="flex gap-2 flex-wrap">
-              ${ex.ulos.map(u => `<span class="px-2 py-1 bg-amber-50 text-amber-900 border border-amber-200 rounded text-xs font-semibold">ULO ${u}:${tamuUloNames[u]}</span>`).join('')}
-            </div>
-          </div>
-        </div>
-      `;
-
-      document.getElementById('exemplarModal').classList.remove('hidden');
-    }
-
-    function closeExemplarModal() {
-      document.getElementById('exemplarModal').classList.add('hidden');
-    }
-
-    // ==========================================
-    // TAB 3 LOGIC: SYLLABUS & AI PROMPT BUILDER
-    // ==========================================
+    /* BUILDER FUNCTIONS */
     function populateBuilderDropdowns() {
-      const select = document.getElementById('builderElementSelect');
-      select.innerHTML = '';
-      dimensionsData.forEach(d => {
-        const opt = document.createElement('option');
-        opt.value = d.id;
-        opt.innerText = `Element ${d.id}: ${d.name}`;
-        select.appendChild(opt);
+      const selectElem = document.getElementById('builderElement');
+      let html = "";
+
+      matrixData.forEach(q => {
+        q.elements.forEach(elem => {
+          html += `<option value="${elem.id}">${elem.title}</option>`;
+        });
       });
-      select.value = 1;
+
+      selectElem.innerHTML = html;
     }
 
-    function generateSyllabusOutput() {
-      const dimId = parseInt(document.getElementById('builderElementSelect').value || 1);
-      const level = parseInt(document.getElementById('builderLevelSelect').value || state.scores[dimId]);
-      const track = document.getElementById('builderTrackSelect').value || state.activeTrack;
+    function updateBuilderExemplars() {
+      const elemId = document.getElementById('builderElement').value;
+      const scope = document.getElementById('builderScope').value;
+      const track = document.getElementById('builderTrack').value;
 
-      const dim = dimensionsData.find(d => d.id === dimId);
-      const levelInfo = dim.tiers[level];
-      const trackKey = track === 'non-stem' ? 'nonStem' : (track === 'co-curricular' ? 'coCurricular' : 'stem');
-      const ex = levelInfo.exemplars[trackKey];
+      let foundElem = null;
+      for (const q of matrixData) {
+        const match = q.elements.find(e => e.id === elemId);
+        if (match) { foundElem = match; break; }
+      }
 
-      const syllabusText = `COURSE HIGH-IMPACT PRACTICE (HIP) COMPONENT
-Dimension: ${dim.name} (${levelInfo.title})
+      if (!foundElem) return;
 
-Pedagogical Rationale:
-This course section is designed around the AAC&U High-Impact Quality Dimension: "${dim.name}". ${levelInfo.descriptor}
+      const exemplars = foundElem.tiers[scope].exemplars[track];
+      const exSelect = document.getElementById('builderExemplarIdx');
 
-Student Learning Outcome (SLO):
-Students will be able to: ${ex.slo}
-
-Activity & Deliverable Breakdown:
-• Primary Learning Activity: ${ex.activity}
-• Course Deliverable: ${ex.deliverable}
-
-Assessment & Growth Expectations:
-${levelInfo.recommendation}
-
-Alignment with Texas A&M Undergraduate Learning Outcomes (ULOs):
-${ex.ulos.map(u => `• ULO ${u}:${tamuUloNames[u]}`).join('\n')}`;
-
-      document.getElementById('syllabusOutputText').innerText = syllabusText;
-      document.getElementById('syllabusPromptOutputText').innerText = levelInfo.aiPrompt;
+      exSelect.innerHTML = exemplars.map((ex, idx) => `<option value="${idx}">${ex.discipline}</option>`).join('');
+      generateSyllabusText();
     }
 
-    // Event Listeners Setup
-    function setupEventListeners() {
-      document.getElementById('closeDrawerBtn').onclick = closeDrawer;
-      document.getElementById('drawerCloseFooterBtn').onclick = closeDrawer;
-      document.getElementById('drawerBackdrop').onclick = closeDrawer;
+    function generateSyllabusText() {
+      const elemId = document.getElementById('builderElement').value;
+      const scope = document.getElementById('builderScope').value;
+      const track = document.getElementById('builderTrack').value;
+      const idx = document.getElementById('builderExemplarIdx').value;
 
-      document.getElementById('resetBtn').onclick = () => {
-        state.scores = { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1 };
-        renderRadarMatrixForm();
-        updateChart();
-        renderFidelityMatrix();
-        generateSyllabusOutput();
-        showToast("Diagnostic form reset to Level 1 default.");
-      };
+      let foundElem = null;
+      for (const q of matrixData) {
+        const match = q.elements.find(e => e.id === elemId);
+        if (match) { foundElem = match; break; }
+      }
 
-      document.getElementById('copyPromptBtn').onclick = () => {
-        navigator.clipboard.writeText(document.getElementById('drawerAiPrompt').innerText).then(() => {
-          showToast("AI Scaffolding Prompt copied to clipboard!");
-        });
-      };
+      if (!foundElem) return;
 
-      document.getElementById('copySyllabusBtn').onclick = () => {
-        navigator.clipboard.writeText(document.getElementById('syllabusOutputText').innerText).then(() => {
-          showToast("Syllabus Section copied to clipboard!");
-        });
-      };
+      const ex = foundElem.tiers[scope].exemplars[track][idx];
+      if (!ex) return;
 
-      document.getElementById('copySyllabusPromptBtn').onclick = () => {
-        navigator.clipboard.writeText(document.getElementById('syllabusPromptOutputText').innerText).then(() => {
-          showToast("AI Scaffolding Prompt copied to clipboard!");
-        });
-      };
+      const ulosFormatted = ex.ulos.map(u => `  - ${TAMU_ULOS[u] || u}`).join('\n');
+
+      const text = `COURSE SYLLABUS HIGH-IMPACT PRACTICE (HIP) COMPONENT
+----------------------------------------------------------------------
+Quality Element: ${foundElem.title}
+Developmental Scope: ${scope.toUpperCase()} Level
+Disciplinary Framework: ${ex.discipline}
+
+1. HIGH-IMPACT PRACTICE LEARNING OBJECTIVE
+Students will be able to:
+${ex.outcome}
+
+2. EXPERIENTIAL LEARNING ACTIVITY & PEDAGOGICAL DESIGN
+${ex.activity}
+
+3. DIRECT ASSESSMENT & EVIDENCE OF MASTERY
+${ex.assessment}
+
+4. ALIGNED TEXAS A&M UNDERGRADUATE LEARNING OUTCOMES (ULOs)
+This activity directly develops and assesses the following university-wide outcomes:
+${ulosFormatted}`;
+
+      document.getElementById('syllabusOutput').textContent = text;
     }
 
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      document.getElementById('toastMsg').innerText = msg;
-      toast.classList.remove('translate-y-10', 'opacity-0');
-      setTimeout(() => {
-        toast.classList.add('translate-y-10', 'opacity-0');
-      }, 3000);
+    function copySyllabusText() {
+      const text = document.getElementById('syllabusOutput').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Syllabus language copied to clipboard!");
+      });
     }
   </script>
 </body>
