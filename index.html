@@ -1,1077 +1,690 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TAMU High-Impact Practices (HIPs) Faculty Hub & Diagnostic Tool</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Font Awesome Icons CDN -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            tamu: {
-              maroon: '#500000',
-              dark: '#3c0000',
-              light: '#700000',
-              gold: '#d4af37',
-              gray: '#333333'
-            }
-          }
-        }
-      }
-    }
-  </script>
-
-  <style>
-    .drawer-transform {
-      transition: transform 0.3s ease-in-out;
-    }
-    .scrollbar-thin::-webkit-scrollbar {
-      width: 6px;
-    }
-    .scrollbar-thin::-webkit-scrollbar-thumb {
-      background-color: #cbd5e1;
-      border-radius: 3px;
-    }
-    .tab-active {
-      border-bottom: 3px solid #d4af37;
-      color: #ffffff !important;
-      font-weight: 700;
-    }
-    @media print {
-      header, nav, button, #actionDrawer, #drawerBackdrop, #toast, .no-print {
-        display: none !important;
-      }
-      body {
-        background-color: white !important;
-        color: black !important;
-      }
-      .print-full-width {
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAMU High-Impact Practices (HIPs) Fidelity & Integration Suite</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .maroon-bg { background-color: #500000; }
+        .maroon-text { color: #500000; }
+        .maroon-border { border-color: #500000; }
+        .tab-btn.active { border-bottom: 3px solid #500000; color: #500000; font-weight: 700; }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col">
 
-  <!-- Texas A&M Header -->
-  <header class="bg-tamu-maroon text-white border-b-4 border-tamu-gold sticky top-0 z-30 shadow-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-white text-tamu-maroon font-serif font-black text-2xl flex items-center justify-center rounded shadow-sm border border-tamu-gold">
-          ATM
+    <!-- Header / Branding -->
+    <header class="maroon-bg text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-4 mb-4 md:mb-0">
+                <div class="bg-white text-[#500000] font-black text-2xl w-12 h-12 rounded-lg flex items-center justify-center shadow">
+                    ATM
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-tight">HIPs Fidelity & Integration Suite</h1>
+                    <p class="text-xs text-amber-200">AAC&U Quality Elements & TAMU University Learning Outcomes (ULOs)</p>
+                </div>
+            </div>
+            <div class="text-right text-xs opacity-90">
+                <span class="inline-block bg-amber-500 text-slate-900 px-2.5 py-1 rounded-full font-semibold">
+                    Curriculum Design Tool
+                </span>
+            </div>
         </div>
-        <div>
-          <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            High-Impact Practices (HIPs) Faculty Hub
-          </h1>
-          <p class="text-xs text-amber-200/90 mt-0.5">Texas A&M University • Assessment, Fidelity & AI Scaffolding Engine</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-3 no-print">
-        <button id="resetBtn" class="px-3 py-1.5 text-xs font-medium text-amber-100 hover:text-white bg-tamu-dark hover:bg-tamu-light rounded-md transition flex items-center gap-1.5 border border-tamu-light">
-          <i class="fa-solid fa-rotate-left"></i> Reset Diagnostic
-        </button>
-        <button onclick="window.print()" class="px-3 py-1.5 text-xs font-semibold text-tamu-maroon bg-tamu-gold hover:bg-amber-300 rounded-md transition flex items-center gap-1.5 shadow-sm">
-          <i class="fa-solid fa-print"></i> Export / Print
-        </button>
-      </div>
-    </div>
+    </header>
 
-    <!-- Tab Navigation -->
-    <nav class="bg-tamu-dark text-slate-300 text-sm font-medium border-t border-tamu-light/50 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-7xl mx-auto flex space-x-6 overflow-x-auto scrollbar-thin">
-        <button onclick="switchTab('fidelity')" id="tabNav-fidelity" class="py-3 px-2 text-slate-300 hover:text-white flex items-center gap-2 border-b-2 border-transparent transition whitespace-nowrap tab-active">
-          <i class="fa-solid fa-table-cells-large"></i> 1. HIP Fidelity Matrix
-        </button>
-        <button onclick="switchTab('radar')" id="tabNav-radar" class="py-3 px-2 text-slate-300 hover:text-white flex items-center gap-2 border-b-2 border-transparent transition whitespace-nowrap">
-          <i class="fa-solid fa-chart-pie"></i> 2. Self-Diagnostic Radar Tool
-        </button>
-        <button onclick="switchTab('generator')" id="tabNav-generator" class="py-3 px-2 text-slate-300 hover:text-white flex items-center gap-2 border-b-2 border-transparent transition whitespace-nowrap">
-          <i class="fa-solid fa-file-pen"></i> 3. Syllabus & Rubric Generator
-        </button>
-      </div>
-    </nav>
-  </header>
-
-  <!-- Main Container -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
-
-    <!-- TAB 1: HIP FIDELITY MATRIX -->
-    <section id="tab-fidelity" class="space-y-6">
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-          <div>
-            <h2 class="text-xl font-bold text-slate-900">High-Impact Practice Fidelity Matrix</h2>
-            <p class="text-xs text-slate-500 mt-1">4-Quadrant framework evaluating high vs. low fidelity implementation across disciplinary contexts.</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-semibold px-2.5 py-1 bg-amber-50 text-tamu-maroon rounded-full border border-amber-200">
-              <i class="fa-solid fa-graduation-cap mr-1"></i> AAC&U Aligned
-            </span>
-          </div>
-        </div>
-
-        <!-- 4 Quadrants Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          
-          <!-- Quadrant 1: High Fidelity / High Impact -->
-          <div class="bg-emerald-50/60 border-2 border-emerald-300 rounded-xl p-5 relative space-y-3">
-            <div class="flex justify-between items-start">
-              <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-full border border-emerald-200">
-                Quadrant I • High Fidelity / High Impact
-              </span>
-              <i class="fa-solid fa-circle-check text-emerald-600 text-lg"></i>
-            </div>
-            <h3 class="text-base font-bold text-emerald-950">Transformational Learning (Gold Standard)</h3>
-            <p class="text-xs text-emerald-900 leading-relaxed">
-              Integrates 6+ quality elements (e.g., intensive feedback, public presentation, deep reflection). Produces measurable mastery of TAMU University Learning Outcomes (ULOs).
-            </p>
-            <div class="pt-2">
-              <button onclick="openExemplarModal('q1')" class="text-xs font-semibold text-emerald-800 hover:text-emerald-950 bg-white px-3 py-1.5 rounded-md border border-emerald-300 shadow-sm transition flex items-center gap-1.5">
-                <i class="fa-solid fa-folder-open"></i> View Exemplars (STEM, Non-STEM, Co-Curricular)
-              </button>
-            </div>
-          </div>
-
-          <!-- Quadrant 2: Low Fidelity / High Potential -->
-          <div class="bg-amber-50/60 border-2 border-amber-300 rounded-xl p-5 relative space-y-3">
-            <div class="flex justify-between items-start">
-              <span class="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-2.5 py-1 rounded-full border border-amber-200">
-                Quadrant II • High Potential / Low Fidelity
-              </span>
-              <i class="fa-solid fa-triangle-exclamation text-amber-600 text-lg"></i>
-            </div>
-            <h3 class="text-base font-bold text-amber-950">HIP "In Name Only" (Needs Scaffolding)</h3>
-            <p class="text-xs text-amber-900 leading-relaxed">
-              Designated as a capstone, internship, or research course, but lacks iterative feedback, public showcase, or structured synthesis. High potential requiring structural upgrades.
-            </p>
-            <div class="pt-2">
-              <button onclick="openExemplarModal('q2')" class="text-xs font-semibold text-amber-800 hover:text-amber-950 bg-white px-3 py-1.5 rounded-md border border-amber-300 shadow-sm transition flex items-center gap-1.5">
-                <i class="fa-solid fa-folder-open"></i> View Upgrades & Exemplars
-              </button>
-            </div>
-          </div>
-
-          <!-- Quadrant 3: High Effort / Low Fidelity -->
-          <div class="bg-blue-50/60 border-2 border-blue-300 rounded-xl p-5 relative space-y-3">
-            <div class="flex justify-between items-start">
-              <span class="text-xs font-bold uppercase tracking-wider text-blue-800 bg-blue-100 px-2.5 py-1 rounded-full border border-blue-200">
-                Quadrant III • High Workload / Low Impact
-              </span>
-              <i class="fa-solid fa-gauge-high text-blue-600 text-lg"></i>
-            </div>
-            <h3 class="text-base font-bold text-blue-950">Transactional Effort (Faculty Burnout Risk)</h3>
-            <p class="text-xs text-blue-900 leading-relaxed">
-              Heavy grading burden or lengthy assignments without clear connection to real-world application, peer interaction, or self-reflection. High effort without matching impact.
-            </p>
-            <div class="pt-2">
-              <button onclick="openExemplarModal('q3')" class="text-xs font-semibold text-blue-800 hover:text-blue-950 bg-white px-3 py-1.5 rounded-md border border-blue-300 shadow-sm transition flex items-center gap-1.5">
-                <i class="fa-solid fa-folder-open"></i> Streamlining Strategies
-              </button>
-            </div>
-          </div>
-
-          <!-- Quadrant 4: Low Fidelity / Low Impact -->
-          <div class="bg-slate-100 border-2 border-slate-300 rounded-xl p-5 relative space-y-3">
-            <div class="flex justify-between items-start">
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-700 bg-slate-200 px-2.5 py-1 rounded-full border border-slate-300">
-                Quadrant IV • Conventional Instruction
-              </span>
-              <i class="fa-solid fa-book-open text-slate-500 text-lg"></i>
-            </div>
-            <h3 class="text-base font-bold text-slate-900">Standard Didactic Design</h3>
-            <p class="text-xs text-slate-600 leading-relaxed">
-              Traditional lecture and exam format. Useful for broad content delivery, but does not fulfill high-impact experiential learning or professional competency goals.
-            </p>
-            <div class="pt-2">
-              <button onclick="openExemplarModal('q4')" class="text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white px-3 py-1.5 rounded-md border border-slate-300 shadow-sm transition flex items-center gap-1.5">
-                <i class="fa-solid fa-folder-open"></i> Conversion Pathways
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 2: SELF-DIAGNOSTIC RADAR CHART & FORM -->
-    <section id="tab-radar" class="space-y-6 hidden">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        <!-- Diagnostic Matrix Form (7 cols) -->
-        <div class="lg:col-span-7 space-y-6">
-          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-            <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
-              <div>
-                <h2 class="text-lg font-bold text-slate-900">1. Course Assessment Matrix</h2>
-                <p class="text-xs text-slate-500">Select the current tier for each of the 8 High-Impact dimensions below.</p>
-              </div>
-              <span class="text-xs font-bold px-3 py-1 bg-tamu-maroon text-amber-200 rounded-full border border-tamu-gold" id="completionBadge">8/8 Completed</span>
-            </div>
-
-            <!-- 8 Dimensions Selection List -->
-            <div id="dimensionsList" class="space-y-4">
-              <!-- Dynamically populated by JS -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Visual Dashboard & Analytics (5 cols) -->
-        <div class="lg:col-span-5 space-y-6 lg:sticky lg:top-24 self-start">
-          
-          <!-- Radar Chart Card -->
-          <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-base font-bold text-slate-900">2. HIPs Profile Map</h2>
-              <span class="text-xs text-slate-400">Click a point or title to inspect</span>
-            </div>
-            <div class="relative w-full aspect-square max-w-sm mx-auto">
-              <canvas id="hipsRadarChart"></canvas>
-            </div>
-          </div>
-
-          <!-- Quick Guidance Banner -->
-          <div class="bg-gradient-to-br from-tamu-maroon to-tamu-dark text-white p-5 rounded-xl shadow-sm border border-tamu-gold/40 relative overflow-hidden">
-            <div class="relative z-10 space-y-2">
-              <div class="flex items-center gap-2 text-amber-300 font-semibold text-sm">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> AI Integration Ready
-              </div>
-              <p class="text-xs text-slate-200 leading-relaxed">
-                Click any dimension in the matrix or chart to launch the <strong>Action & AI Scaffolding Panel</strong>. Get tailored prompts designed to generate assignments, rubrics, and activities directly for your discipline.
-              </p>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- TAB 3: SYLLABUS & RUBRIC GENERATOR -->
-    <section id="tab-generator" class="space-y-6 hidden">
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6">
-        <div class="pb-4 border-b border-slate-100">
-          <h2 class="text-xl font-bold text-slate-900">Dynamic Syllabus & Rubric Generator</h2>
-          <p class="text-xs text-slate-500 mt-1">Generate tailored syllabus language, assessment rubrics, and TAMU University Learning Outcomes (ULO) mapping.</p>
-        </div>
-
-        <!-- Control Inputs -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">HIP Activity Type</label>
-            <select id="genHipType" class="w-full text-xs font-medium bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-tamu-maroon outline-none">
-              <option value="research">Undergraduate Research & Inquiry</option>
-              <option value="service">Service-Learning / Community Engagement</option>
-              <option value="global">Global Learning & Cultural Competence</option>
-              <option value="capstone">Culminating Senior Capstone</option>
-              <option value="internship">Internship & Field Experience</option>
-              <option value="writing">Writing-Intensive Collaborative Seminar</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Disciplinary Domain</label>
-            <select id="genDomain" class="w-full text-xs font-medium bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-tamu-maroon outline-none">
-              <option value="stem">STEM & Health Sciences</option>
-              <option value="humanities">Humanities, Arts & Social Sciences</option>
-              <option value="business">Business & Professional Studies</option>
-              <option value="cocurricular">Co-Curricular & Student Leadership</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Primary TAMU ULO Alignment</label>
-            <select id="genUlo" class="w-full text-xs font-medium bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-tamu-maroon outline-none">
-              <option value="critical">Critical Thinking & Problem Solving</option>
-              <option value="communication">Effective Communication</option>
-              <option value="cultural">Social & Cultural Competence</option>
-              <option value="knowledge">Mastery of Disciplinary Knowledge</option>
-              <option value="lifelong">Personal & Lifelong Learning</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="flex justify-end">
-          <button onclick="generateSyllabusPackage()" class="px-5 py-2.5 bg-tamu-maroon hover:bg-tamu-light text-amber-200 text-xs font-bold rounded-lg shadow transition flex items-center gap-2 border border-tamu-gold">
-            <i class="fa-solid fa-gears"></i> Generate Syllabus & Rubric Package
-          </button>
-        </div>
-
-        <!-- Generated Output Container -->
-        <div class="space-y-6 pt-4 border-t border-slate-200">
-          
-          <!-- Section 1: Syllabus Statement -->
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
-            <div class="flex justify-between items-center">
-              <h3 class="text-sm font-bold text-tamu-maroon flex items-center gap-2">
-                <i class="fa-solid fa-file-contract"></i> 1. Official Course Syllabus HIP Statement
-              </h3>
-              <button onclick="copyGeneratedText('generatedSyllabus')" class="text-xs font-semibold text-tamu-maroon bg-white hover:bg-amber-50 px-2.5 py-1 rounded border border-slate-300 shadow-sm flex items-center gap-1">
-                <i class="fa-regular fa-copy"></i> Copy Statement
-              </button>
-            </div>
-            <p id="generatedSyllabus" class="text-xs text-slate-700 leading-relaxed font-sans bg-white p-4 rounded-lg border border-slate-200 whitespace-pre-wrap"></p>
-          </div>
-
-          <!-- Section 2: Rubric Blueprint -->
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
-            <div class="flex justify-between items-center">
-              <h3 class="text-sm font-bold text-tamu-maroon flex items-center gap-2">
-                <i class="fa-solid fa-table-list"></i> 2. High-Impact Assessment Rubric Blueprint
-              </h3>
-              <button onclick="copyGeneratedText('generatedRubric')" class="text-xs font-semibold text-tamu-maroon bg-white hover:bg-amber-50 px-2.5 py-1 rounded border border-slate-300 shadow-sm flex items-center gap-1">
-                <i class="fa-regular fa-copy"></i> Copy Rubric
-              </button>
-            </div>
-            <div id="generatedRubric" class="text-xs text-slate-700 leading-relaxed bg-white p-4 rounded-lg border border-slate-200 overflow-x-auto whitespace-pre-wrap font-mono"></div>
-          </div>
-
-          <!-- Section 3: TAMU ULO Mapping -->
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
-            <div class="flex justify-between items-center">
-              <h3 class="text-sm font-bold text-tamu-maroon flex items-center gap-2">
-                <i class="fa-solid fa-bullseye"></i> 3. TAMU University Learning Outcome (ULO) Alignment Grid
-              </h3>
-              <button onclick="copyGeneratedText('generatedUlo')" class="text-xs font-semibold text-tamu-maroon bg-white hover:bg-amber-50 px-2.5 py-1 rounded border border-slate-300 shadow-sm flex items-center gap-1">
-                <i class="fa-regular fa-copy"></i> Copy ULO Mapping
-              </button>
-            </div>
-            <div id="generatedUlo" class="text-xs text-slate-700 leading-relaxed bg-white p-4 rounded-lg border border-slate-200 whitespace-pre-wrap"></div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- Exemplar Modal (Tab 1) -->
-  <div id="exemplarModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col border border-slate-200">
-      <div class="p-5 bg-tamu-maroon text-white rounded-t-xl flex justify-between items-center shrink-0">
-        <h3 id="modalTitle" class="text-base font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-book-open text-amber-300"></i> Disciplinary Exemplars
-        </h3>
-        <button onclick="closeExemplarModal()" class="text-slate-300 hover:text-white p-1">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-      <div id="modalBody" class="p-6 overflow-y-auto space-y-4 text-xs leading-relaxed text-slate-700 scrollbar-thin">
-        <!-- Injected dynamically -->
-      </div>
-      <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end shrink-0">
-        <button onclick="closeExemplarModal()" class="px-4 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-100">
-          Close Window
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Slide-Out Drawer Panel for Tab 2 -->
-  <div id="drawerBackdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300"></div>
-  
-  <aside id="actionDrawer" class="fixed top-0 right-0 h-full w-full max-w-xl bg-white z-50 shadow-2xl drawer-transform translate-x-full flex flex-col border-l border-slate-200">
-    
-    <!-- Drawer Header -->
-    <div class="p-6 bg-tamu-maroon text-white flex justify-between items-start shrink-0 border-b-2 border-tamu-gold">
-      <div class="space-y-1">
-        <span id="drawerDimCategory" class="text-xs font-bold uppercase tracking-wider text-amber-300">Dimension 1</span>
-        <h3 id="drawerDimTitle" class="text-xl font-bold text-white">High Performance Expectations</h3>
-        <div id="drawerTierBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-tamu-dark text-amber-100 border border-tamu-light mt-2">
-          <!-- Tier Badge dynamically injected -->
-        </div>
-      </div>
-      <button id="closeDrawerBtn" class="text-amber-200 hover:text-white p-1 rounded-lg transition">
-        <i class="fa-solid fa-xmark text-xl"></i>
-      </button>
-    </div>
-
-    <!-- Drawer Content (Scrollable 4-Part Structure) -->
-    <div class="p-6 overflow-y-auto flex-1 space-y-6 scrollbar-thin">
-      
-      <!-- 1. Tier Level & Status -->
-      <div class="space-y-2">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-          <span class="w-5 h-5 rounded-full bg-amber-100 text-tamu-maroon flex items-center justify-center text-xs font-bold">1</span>
-          Tier Status & Level
-        </h4>
-        <div id="drawerStatusText" class="p-3.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold text-slate-800">
-          <!-- Injected by JS -->
-        </div>
-      </div>
-
-      <!-- 2. Descriptor -->
-      <div class="space-y-2">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-          <span class="w-5 h-5 rounded-full bg-amber-100 text-tamu-maroon flex items-center justify-center text-xs font-bold">2</span>
-          Current Descriptor & Indicators
-        </h4>
-        <p id="drawerDescriptor" class="text-sm text-slate-600 leading-relaxed p-4 bg-slate-50 border border-slate-100 rounded-lg">
-          <!-- Injected by JS -->
-        </p>
-      </div>
-
-      <!-- 3. Actionable Recommendation -->
-      <div class="space-y-2">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-          <span class="w-5 h-5 rounded-full bg-amber-100 text-tamu-maroon flex items-center justify-center text-xs font-bold">3</span>
-          Actionable Growth Recommendation
-        </h4>
-        <div id="drawerRecommendation" class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-lg text-sm leading-relaxed">
-          <!-- Injected by JS -->
-        </div>
-      </div>
-
-      <!-- 4. High-Quality AI Scaffolding Prompt -->
-      <div class="space-y-3 pt-2">
-        <div class="flex justify-between items-center">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full bg-amber-100 text-tamu-maroon flex items-center justify-center text-xs font-bold">4</span>
-            High-Quality AI Implementation Prompt
-          </h4>
-          <button id="copyPromptBtn" class="px-2.5 py-1 text-xs font-semibold text-tamu-maroon bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded transition flex items-center gap-1.5">
-            <i class="fa-regular fa-copy"></i> Copy Prompt
-          </button>
-        </div>
-        
-        <div class="relative">
-          <pre id="drawerAiPrompt" class="p-4 bg-slate-900 text-amber-200 text-xs font-mono rounded-lg overflow-x-auto whitespace-pre-wrap leading-relaxed border border-slate-800 select-all"></pre>
-        </div>
-        <p class="text-[11px] text-slate-400 italic">
-          <i class="fa-solid fa-circle-info mr-1"></i> Replace bracketed text like <code>[Insert Course Name]</code> before submitting into ChatGPT, Claude, or Copilot.
-        </p>
-      </div>
-
-    </div>
-
-    <!-- Drawer Footer -->
-    <div class="p-4 bg-slate-50 border-t border-slate-200 shrink-0 flex justify-end">
-      <button id="drawerCloseFooterBtn" class="px-4 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition">
-        Done Inspecting
-      </button>
-    </div>
-  </aside>
-
-  <!-- Notification Toast -->
-  <div id="toast" class="fixed bottom-6 right-6 bg-tamu-maroon text-white border border-tamu-gold px-4 py-3 rounded-lg shadow-xl text-xs font-medium flex items-center gap-2 z-50 transform translate-y-10 opacity-0 transition-all duration-300 pointer-events-none">
-    <i class="fa-solid fa-circle-check text-amber-300 text-base"></i>
-    <span id="toastMsg">Action completed!</span>
-  </div>
-
-  <!-- JavaScript Application Architecture -->
-  <script>
-    // 8-Dimension Diagnostic Data
-    const dimensionsData = [
-      {
-        id: 1,
-        name: "High Performance Expectations",
-        shortName: "High Expectations",
-        tiers: {
-          1: {
-            title: "Foundational (Tier 1)",
-            descriptor: "Learning goals emphasize lower-level Bloom’s taxonomy tasks (recall, comprehension). High expectations are stated in the syllabus but lack explicit scaffolding in assignment design.",
-            recommendation: "Elevate learning outcomes from passive recall to analytical evaluation by introducing explicit criteria and high-challenge, low-stakes practice opportunities.",
-            aiPrompt: `Act as a University Instructional Designer specializing in High-Impact Practices (HIPs). I teach [Insert Course Name] for [Insert Student Level/Major]. \n\nCurrently, my main course assignment requires students to [Insert Current Assignment, e.g., summarize textbook chapters]. I want to raise the intellectual challenge of this task to target higher-order thinking (Analysis/Evaluation) without overwhelming students or dramatically increasing my grading burden.\n\nPlease generate:\n1. Three revised options for this assignment that require students to analyze, compare, or evaluate real scenarios in [Insert Discipline].\n2. A clear, 3-level performance rubric scale (Exceeds Expectations, Meets Expectations, Developing) outlining what high performance looks like.\n3. A brief 100-word syllabus callout explaining the higher expectations and how students will be supported to meet them.`
-          },
-          2: {
-            title: "Developing (Tier 2)",
-            descriptor: "Assignments regularly require analysis and application, but criteria for exemplary performance are only partially defined or shared after submission.",
-            recommendation: "Provide exemplar student work models and explicit analytical rubrics prior to submission to make high performance criteria completely transparent.",
-            aiPrompt: `Act as a Higher Education Curriculum Expert. I teach [Insert Course Name]. My students complete [Insert Assignment Name, e.g., a critical analysis paper], but many struggle to reach top-tier analytical rigor.\n\nHelp me design explicit exemplars and scaffolding to clarify high expectations before they submit.\n\nPlease generate:\n1. A rubric checklist distinguishing 'Good' (B-level) work from 'Exemplary' (A-level) work in [Insert Discipline].\n2. A guided exercise where students evaluate a sample paper and annotate how to upgrade it.\n3. Three targeted self-assessment questions students must answer before turning in their final draft.`
-          },
-          3: {
-            title: "Advanced / High-Impact (Tier 3)",
-            descriptor: "High performance expectations are co-created or explicitly aligned with professional/disciplinary standards, with continuous scaffolding and authentic stretch goals.",
-            recommendation: "Sustain excellence by involving students in peer mentoring or publishing exemplary outcomes in department repositories or professional venues.",
-            aiPrompt: `Act as a Senior Academic Quality Lead. I teach [Insert Course Name], where students achieve Tier 3 High Performance Expectations on [Insert Project Name].\n\nI want to create a framework for students to archive, publish, or present their high-caliber work to external academic or professional audiences.\n\nPlease generate:\n1. A digital portfolio template for students to feature their top-tier course work.\n2. A student reflection guide on translating high-impact course achievements into resume accomplishments.\n3. A brief peer-mentorship protocol for high-performing students to coach future cohorts.`
-          }
-        }
-      },
-      {
-        id: 2,
-        name: "Significant Investment of Time and Effort",
-        shortName: "Time & Effort",
-        tiers: {
-          1: {
-            title: "Foundational (Tier 1)",
-            descriptor: "Student effort is unevenly distributed, spiking heavily before major exams or final papers with minimal sustained engagement during intermediate weeks.",
-            recommendation: "Break major term deliverables into a scaffolded, multi-stage project timeline with low-stakes weekly or bi-weekly progress checks.",
-            aiPrompt: `Act as a Higher Education Curriculum Expert. I teach [Insert Course Name], where students complete a major final project: [Insert Project Description]. Currently, students submit the entire project at the end of the term, leading to last-minute, low-quality work.\n\nHelp me convert this into a scaffolded project timeline spread across a [Insert Number]-week semester.\n\nPlease generate:\n1. A 4-stage milestone schedule with specific deliverables for each milestone.\n2. A low-stakes peer-check activity for Stage 2 that takes 15 minutes of class time.\n3. A student-facing task breakdown guide that estimates student time commitment (hours/week) for each phase.`
-          },
-          2: {
-            title: "Developing (Tier 2)",
-            descriptor: "Milestones exist across the term, but students treat intermediate submissions as transactional deadlines rather than deep iterative effort.",
-            recommendation: "Incorporate reflective progress logs and required draft revisions between milestones to deepen sustained engagement.",
-            aiPrompt: `Act as an Instructional Designer. I teach [Insert Course Name]. Students submit milestones for [Insert Project], but treat them as quick checkpoints rather than engaging deeply.\n\nPlease generate:\n1. A structured 5-minute weekly 'Effort & Progress Log' template for students.\n2. A revision protocol requiring students to state how they acted on milestone feedback.\n3. A student-facing rationale on why sustained effort improves long-term mastery.`
-          },
-          3: {
-            title: "Advanced / High-Impact (Tier 3)",
-            descriptor: "Extended, cumulative project work demands sustained, intense intellectual energy and problem-solving over a prolonged duration.",
-            recommendation: "Provide workload management strategies and structured collaborative accountability groups to support sustained high effort.",
-            aiPrompt: `Act as a Student Success & Curriculum Architect. I teach an intensive course: [Insert Course Name].\n\nHelp me design an accountability framework to support students through heavy project workloads.\n\nPlease generate:\n1. A peer-accountability triadic check-in system.\n2. A stress-mitigation and time-budgeting worksheet for complex team projects.\n3. A rubric evaluating sustained project management and iterative development.`
-          }
-        }
-      },
-      {
-        id: 3,
-        name: "Meaningful Interactions with Faculty and Peers",
-        shortName: "Interactions",
-        tiers: {
-          1: {
-            title: "Foundational (Tier 1)",
-            descriptor: "Interaction is predominantly instructor-led lecture with occasional unstructured Q&A; peer interaction is limited or optional.",
-            recommendation: "Embed structured peer-review cycles and short, high-impact micro-conferences into project work cycles.",
-            aiPrompt: `Act as an Instructional Designer expert in active learning. In my course [Insert Course Name], students work on [Insert Project/Assignment]. I want to create a structured, efficient peer review and faculty check-in protocol that improves work quality before final submission.\n\nPlease generate:\n1. A 20-minute, 3-step structured peer feedback protocol (Praise, Question, Polish) tailored to evaluate [Insert Specific Skill/Deliverable].\n2. A 3-question self-assessment sheet students must complete before meeting with me for a 3-minute mid-project conference.\n3. A brief guide on how students should respond to peer feedback in a revision memo.`
-          },
-          2: {
-            title: "Developing (Tier 2)",
-            descriptor: "Peer discussions and group work occur regularly, but interactions lack structured roles, clear feedback protocols, or deep faculty feedback.",
-            recommendation: "Formalize peer roles and integrate formative micro-check-ins into team activities.",
-            aiPrompt: `Act as an Active Learning Consultant. I teach [Insert Course Name]. I use group discussions on [Insert Topic], but student interaction remains superficial.\n\nPlease generate:\n1. Four defined group roles (e.g., Synthesizer, Skeptic, Advocate, Recorder) tailored to my topic.\n2. A structured 15-minute debate or collaborative mapping protocol.\n3. A faculty observation checklist to evaluate the depth of peer interaction.`
-          },
-          3: {
-            title: "Advanced / High-Impact (Tier 3)",
-            descriptor: "Frequent, substantive interactions occur continuously between faculty and peers regarding course content, mentoring, and professional growth.",
-            recommendation: "Establish collaborative research or co-creation frameworks where faculty and students operate as co-investigators.",
-            aiPrompt: `Act as a Higher Education Mentorship Specialist. I teach [Insert Course Name].\n\nHelp me structure a co-creation framework where students collaborate directly with faculty on authentic disciplinary challenges.\n\nPlease generate:\n1. A bi-weekly research/project check-in template.\n2. A co-mentoring protocol for student leads.\n3. A qualitative evaluation tool for collaborative learning culture.`
-          }
-        }
-      },
-      {
-        id: 4,
-        name: "Experiences with Diversity & Global Perspectives",
-        shortName: "Diversity & Global",
-        tiers: {
-          1: {
-            title: "Foundational (Tier 1)",
-            descriptor: "Course content primarily presents single-perspective or traditional dominant frameworks, with limited engagement with diverse cultural or global contexts.",
-            recommendation: "Introduce comparative case studies or diverse scholarly perspectives that challenge foundational assumptions within the field.",
-            aiPrompt: `Act as a Culturally Responsive Pedagogy Specialist in higher education. I teach [Insert Course Name] focusing on [Insert Main Topic/Discipline]. Currently, my course material primarily focuses on traditional or domestic perspectives.\n\nHelp me diversify the perspectives in my curriculum without sacrificing core discipline coverage.\n\nPlease generate:\n1. Three alternative case study concepts or global examples that apply core course principles to diverse, underrepresented, or international contexts.\n2. Two discussion prompts that encourage students to critically examine how cultural, economic, or geographic context alters problem-solving in [Insert Field].\n3. A list of 3 search strategies/databases to help me locate open-access readings from global scholars in this field.`
-          },
-          2: {
-            title: "Developing (Tier 2)",
-            descriptor: "Diverse readings or guest speakers are included, but remain supplementary rather than integrated into core assessments or analytical models.",
-            recommendation: "Integrate diverse perspectives directly into core assessment rubrics and comparative analytical assignments.",
-            aiPrompt: `Act as a Curriculum Inclusion Expert. I teach [Insert Course Name]. I include diverse readings on [Insert Topics], but students are not required to synthesize them in major assignments.\n\nPlease generate:\n1. A comparative analysis essay prompt requiring integration of global/diverse frameworks.\n2. A grading rubric criterion assessing intercultural analytical depth.\n3. A structured discussion protocol for analyzing conflicting cultural viewpoints.`
-          },
-          3: {
-            title: "Advanced / High-Impact (Tier 3)",
-            descriptor: "Students actively engage with diverse individuals, communities, or global systems, experiencing real worldview challenges and intercultural growth.",
-            recommendation: "Foster immersive community-engaged learning or virtual international exchanges (COIL) with structured reflection.",
-            aiPrompt: `Act as an Intercultural Education Director. I teach [Insert Course Name].\n\nHelp me structure a Collaborative Online International Learning (COIL) module or community cultural exchange.\n\nPlease generate:\n1. A 3-week joint project blueprint between my students and external partners.\n2. An intercultural communication reflection prompt.\n3. An assessment rubric for global civic competency.`
-          }
-        }
-      },
-      {
-        id: 5,
-        name: "Frequent, Timely, and Constructive Feedback",
-        shortName: "Feedback",
-        tiers: {
-          1: {
-            title: "Foundational (Tier 1)",
-            descriptor: "Feedback consists primarily of numeric grades on high-stakes assessments given late in the term with limited diagnostic comments.",
-            recommendation: "Implement iterative 'draft-and-resubmit' loops or milestone-based feedback that requires students to explicitly apply comments.",
-            aiPrompt: `Act as an Assessment Expert in Higher Education. I teach [Insert Course Name] with [Insert Class Size] students. I give detailed feedback on [Insert Assignment Name], but students rarely implement my feedback on subsequent work.\n\nHelp me design a sustainable feedback-application loop that fits my teaching workload.\n\nPlease generate:\n1. A 'Feedback Action Plan' template (1-page) that students must submit alongside their revised draft, showing where and how they addressed past feedback.\n2. A streamlined 4-part analytic rubric focusing strictly on growth, revision depth, and response to feedback.\n3. Three boilerplate text templates I can use for quick, high-impact feedback on recurring student errors in [Insert Specific Skill].`
-          },
-          2: {
-            title: "Developing (Tier 2)",
-            descriptor: "Formative feedback is provided on drafts, but lacks immediate opportunities for students to revise or demonstrate growth before final grading.",
-            recommendation: "Establish required revision memos where students document how they addressed specific feedback points.",
-            aiPrompt: `Act as an Educational Assessment Specialist. I teach [Insert Course Name]. I provide comments on mid-term drafts, but want to ensure students actively process them.\n\nPlease generate:\n1. A revision memo submission template for students.\n2. A rapid-grading key/shorthand system for faculty comments.\n3. A self-assessment reflection prompt for post-assignment return.`
-          },
-          3: {
-            title: "Advanced / High-Impact (Tier 3)",
-            descriptor: "Continuous, multi-source feedback (faculty, peer, external experts) is embedded throughout, directly informing immediate revision and mastery.",
-            recommendation: "Automate formative diagnostic checks and incorporate external professional feedback panels.",
-            aiPrompt: `Act as an Assessment Systems Designer. I teach [Insert Course Name].\n\nHelp me design an integrated multi-source feedback loop involving peers and industry professionals.\n\nPlease generate:\n1. A rubric for external reviewer evaluation.\n2. A automated feedback loop workflow for multi-stage deliverables.\n3. A student growth tracking rubric.`
-          }
-        }
-      },
-      {
-        id: 6,
-        name: "Authentic Real-World Application",
-        shortName: "Authentic Application",
-        tiers: {
-          1: {
-            title: "Foundational (Tier 1)",
-            descriptor: "Assignments are academic exercises evaluated solely by the instructor, lacking connection to real-world audiences, industry practices, or community issues.",
-            recommendation: "Shift standard academic papers into authentic professional deliverables (e.g., policy memos, client pitches, technical reports).",
-            aiPrompt: `Act as an Industry Liaison and Instructional Designer. I teach [Insert Course Name]. My current assignment is a traditional academic paper on [Insert Topic]. \n\nI want to transform this into an authentic, industry-standard deliverable that reflects actual work in [Insert Target Field/Profession].\n\nPlease generate:\n1. Three authentic deliverable formats (e.g., Executive Briefing, Client Strategy Proposal, Public Whitepaper) that require the same research depth as a term paper.\n2. A real-world scenario prompt framing the assignment for the student as a professional practitioner.\n3. An evaluation rubric aligned with professional communication standards in [Insert Industry].`
-          },
-          2: {
-            title: "Developing (Tier 2)",
-            descriptor: "Assignments use real-world case studies or datasets, but final deliverables remain internal academic papers submitted only to the instructor.",
-            recommendation: "Partner with community clients or format deliverables for real external stakeholders.",
-            aiPrompt: `Act as an Experiential Learning Designer. I teach [Insert Course Name]. Students analyze real data about [Insert Topic], but turn in a standard paper.\n\nPlease generate:\n1. A client brief scenario for a local stakeholder or business.\n2. An executive presentation format replacing the term paper.\n3. A rubric assessing practical viability and stakeholder communication.`
-          },
-          3: {
-            title: "Advanced / High-Impact (Tier 3)",
-            descriptor: "Students address authentic, unscripted problems for real clients, partners, or public audiences where outcomes have real consequences.",
-            recommendation: "Establish long-term community partnerships and client pitch events for student capstone projects.",
-            aiPrompt: `Act as a Service-Learning Director. I teach [Insert Course Name].\n\nHelp me design a client-facing capstone project framework.\n\nPlease generate:\n1. A Memorandum of Understanding outline for community partners.\n2. A client feedback rubric.\n3. A student ethical engagement code for real-world field work.`
-          }
-        }
-      },
-      {
-        id: 7,
-        name: "Public Demonstration of Competence",
-        shortName: "Public Demonstration",
-        tiers: {
-          1: {
-            title: "Foundational (Tier 1)",
-            descriptor: "Student work is submitted privately to the instructor and seen by no one else.",
-            recommendation: "Elevate internal presentations into a public showcase, digital exhibition, or community partner debrief.",
-            aiPrompt: `Act as an Experiential Learning Coordinator. My students in [Insert Course Name] create [Insert Project Type]. I want to upgrade their final presentation into a public demonstration of competence for [Insert Target Audience, e.g., campus community, local non-profits, industry professionals].\n\nPlease generate:\n1. An event structure outline for a 60-minute digital or live showcase (e.g., Interactive Poster Session, Lightning Pitch Showcase).\n2. A student prep guide explaining how to communicate complex technical work to a non-specialist audience in under 3 minutes.\n3. An external evaluator/audience feedback card template (3 brief questions) for guests to provide constructive notes.`
-          },
-          2: {
-            title: "Developing (Tier 2)",
-            descriptor: "Work is presented to classmates during class time, but does not extend beyond the classroom walls or to external audiences.",
-            recommendation: "Publish student deliverables to a public course website, ePortfolio repository, or campus symposium.",
-            aiPrompt: `Act as a Digital Pedagogy Consultant. I teach [Insert Course Name]. Students present projects in class, but work ends there.\n\nPlease generate:\n1. A digital showcase plan (e.g., ePortfolio/website gallery).\n2. A copyright and public work permission form template.\n3. A rubric for public digital scholarship and visual presentation.`
-          },
-          3: {
-            title: "Advanced / High-Impact (Tier 3)",
-            descriptor: "Students defend, exhibit, or publish work to external professionals, community stakeholders, or broader public audiences.",
-            recommendation: "Incorporate formal professional defense panels and external publication pipelines.",
-            aiPrompt: `Act as an Academic Conference Chair. I teach [Insert Course Name].\n\nHelp me design a formal professional jury panel defense for student final work.\n\nPlease generate:\n1. A panel defense schedule and protocol.\n2. Evaluation rubrics for industry judges.\n3. A student defense preparation guide.`
-          }
-        }
-      },
-      {
-        id: 8,
-        name: "Structured Reflection and Integration",
-        shortName: "Reflection & Integration",
-        tiers: {
-          1: {
-            title: "Foundational (Tier 1)",
-            descriptor: "Reflection is informal or limited to end-of-semester course evaluation surveys without guided connections to prior learning or career trajectories.",
-            recommendation: "Embed structured, integrative reflective prompts at key learning milestones using established reflection frameworks (e.g., DEAL model).",
-            aiPrompt: `Act as a High-Impact Practice (HIP) Specialist in Integrative Learning. I teach [Insert Course Name]. I want to implement structured reflection to help students connect course concepts to their personal goals and other academic courses.\n\nHelp me design a 3-part reflective learning log sequence based on the DEAL Model (Describe, Examine, Articulate Learning).\n\nPlease generate:\n1. Three distinct, guided prompts for the beginning, middle, and end of the semester.\n2. A 150-word student-facing overview explaining the cognitive value of integrative reflection.\n3. A simple Pass/Needs Revision grading rubric focused on depth of reflection rather than writing mechanics.`
-          },
-          2: {
-            title: "Developing (Tier 2)",
-            descriptor: "Reflection occurs at the end of major projects, but focuses primarily on self-assessment of performance rather than synthesizing learning across courses.",
-            recommendation: "Incorporate cross-curricular synthesis prompts connecting current learning to past coursework and future career aims.",
-            aiPrompt: `Act as an Integrative Pedagogy Expert. I teach [Insert Course Name]. Students write post-project reflections, but focus only on what went wrong/right.\n\nPlease generate:\n1. Three synthesis prompts connecting course theory to other discipline courses.\n2. An ePortfolio entry prompt linking project artifacts to career competencies.\n3. A rubric for integrative cognitive complexity.`
-          },
-          3: {
-            title: "Advanced / High-Impact (Tier 3)",
-            descriptor: "Reflection is continuous, cumulative, and integrative (e.g., ePortfolios), requiring students to explicitly synthesize knowledge across domains over time.",
-            recommendation: "Develop a program-wide ePortfolio strategy where students curate and defend integrative growth over multiple years.",
-            aiPrompt: `Act as an ePortfolio & Integrative Learning Director. I lead [Insert Program/Course].\n\nHelp me design a comprehensive capstone ePortfolio reflection architecture.\n\nPlease generate:\n1. A multi-section ePortfolio outline.\n2. Guiding reflective synthesis prompts for each section.\n3. An institutional VALUE rubric for Integrative Learning assessment.`
-          }
-        }
-      }
-    ];
-
-    // Exemplar Content Data for Tab 1
-    const matrixExemplars = {
-      q1: {
-        title: "Quadrant I Exemplars • High Fidelity / High Impact",
-        content: `
-          <div class="space-y-4">
-            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-              <h4 class="font-bold text-emerald-900">STEM: Engineering Capstone & Client Design</h4>
-              <p class="mt-1 text-slate-700">Students work in multidisciplinary teams to solve real industrial client problems over 30 weeks. Deliverables include intermediate prototype milestones, bi-weekly client meetings, formal public showcase defenses before professional engineers, and individual reflective portfolios.</p>
-            </div>
-            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-              <h4 class="font-bold text-emerald-900">Non-STEM: Archival Public History Project</h4>
-              <p class="mt-1 text-slate-700">Students transcribe and analyze primary historical documents from local archives, collaborate with regional museum curators, publish digital exhibitions online, and present findings to local historical societies.</p>
-            </div>
-            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-              <h4 class="font-bold text-emerald-900">Co-Curricular: Student Government Leadership Fellowship</h4>
-              <p class="mt-1 text-slate-700">Student leaders oversee institutional budget proposals, undergo peer mentorship coaching, conduct stakeholder feedback roundtables, and compile an ePortfolio reflecting on civic leadership competencies.</p>
-            </div>
-          </div>
-        `
-      },
-      q2: {
-        title: "Quadrant II Exemplars • Low Fidelity (High Potential)",
-        content: `
-          <div class="space-y-4">
-            <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <h4 class="font-bold text-amber-900">STEM: Unscaffolding Lab Research</h4>
-              <p class="mt-1 text-slate-700"><strong>Current State:</strong> Students complete 100 hours in a research lab but spend time doing repetitive data logging without understanding research design.</p>
-              <p class="mt-1 text-amber-900 font-semibold"><strong>Fidelity Upgrade:</strong> Require bi-weekly research logs, a student-led poster presentation at the campus research symposium, and explicit mentor feedback loops.</p>
-            </div>
-            <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <h4 class="font-bold text-amber-900">Non-STEM: Standard Internship Course</h4>
-              <p class="mt-1 text-slate-700"><strong>Current State:</strong> Students work 10 hours/week off-campus and submit a single 5-page summary at the end of the semester.</p>
-              <p class="mt-1 text-amber-900 font-semibold"><strong>Fidelity Upgrade:</strong> Integrate monthly structured reflection logs (DEAL model), mid-term employer evaluation meetings, and a final executive briefing presentation.</p>
-            </div>
-          </div>
-        `
-      },
-      q3: {
-        title: "Quadrant III Exemplars • High Effort / Low Impact",
-        content: `
-          <div class="space-y-4">
-            <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <h4 class="font-bold text-blue-900">Heavy Research Term Papers</h4>
-              <p class="mt-1 text-slate-700">A 25-page literature review graded solely at the end of term by the professor. Requires immense grading time with zero student opportunity to revise or share with peers.</p>
-              <p class="mt-1 text-blue-900 font-semibold"><strong>Streamlining Strategy:</strong> Convert into 3 scaffolded 5-page briefs with structured peer review cycles and a final 3-minute public elevator pitch session.</p>
-            </div>
-          </div>
-        `
-      },
-      q4: {
-        title: "Quadrant IV Exemplars • Low Fidelity / Conventional Design",
-        content: `
-          <div class="space-y-4">
-            <div class="p-3 bg-slate-100 border border-slate-200 rounded-lg">
-              <h4 class="font-bold text-slate-800">Standard Midterm/Final Exam Course</h4>
-              <p class="mt-1 text-slate-700">Lectures paired with multiple-choice exams. While effective for basic content retention, it provides minimal experiential engagement.</p>
-              <p class="mt-1 text-slate-900 font-semibold"><strong>Conversion Pathway:</strong> Replace 20% of exam weight with a collaborative mini-case study analysis and peer presentation.</p>
-            </div>
-          </div>
-        `
-      }
-    };
-
-    // State Management
-    let userScores = { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1 };
-    let chartInstance = null;
-    let currentInspectedDimId = 1;
-
-    // DOM Elements
-    const dimensionsListEl = document.getElementById('dimensionsList');
-    const completionBadgeEl = document.getElementById('completionBadge');
-    const resetBtn = document.getElementById('resetBtn');
-    
-    // Drawer Elements
-    const drawerBackdrop = document.getElementById('drawerBackdrop');
-    const actionDrawer = document.getElementById('actionDrawer');
-    const closeDrawerBtn = document.getElementById('closeDrawerBtn');
-    const drawerCloseFooterBtn = document.getElementById('drawerCloseFooterBtn');
-    
-    const drawerDimCategory = document.getElementById('drawerDimCategory');
-    const drawerDimTitle = document.getElementById('drawerDimTitle');
-    const drawerTierBadge = document.getElementById('drawerTierBadge');
-    const drawerStatusText = document.getElementById('drawerStatusText');
-    const drawerDescriptor = document.getElementById('drawerDescriptor');
-    const drawerRecommendation = document.getElementById('drawerRecommendation');
-    const drawerAiPrompt = document.getElementById('drawerAiPrompt');
-    const copyPromptBtn = document.getElementById('copyPromptBtn');
-
-    // Tab Navigation System
-    function switchTab(tabId) {
-      ['fidelity', 'radar', 'generator'].forEach(id => {
-        const tabEl = document.getElementById(`tab-${id}`);
-        const navEl = document.getElementById(`tabNav-${id}`);
-        if (id === tabId) {
-          tabEl.classList.remove('hidden');
-          navEl.classList.add('tab-active');
-        } else {
-          tabEl.classList.add('hidden');
-          navEl.classList.remove('tab-active');
-        }
-      });
-
-      if (tabId === 'radar') {
-        setTimeout(() => {
-          if (!chartInstance) {
-            initRadarChart();
-          } else {
-            chartInstance.resize();
-            chartInstance.update();
-          }
-        }, 100);
-      }
-    }
-
-    // Modal System for Tab 1
-    function openExemplarModal(qKey) {
-      const modal = document.getElementById('exemplarModal');
-      const title = document.getElementById('modalTitle');
-      const body = document.getElementById('modalBody');
-
-      const data = matrixExemplars[qKey];
-      if (data) {
-        title.innerHTML = `<i class="fa-solid fa-folder-open text-amber-300"></i> ${data.title}`;
-        body.innerHTML = data.content;
-        modal.classList.remove('hidden');
-      }
-    }
-
-    function closeExemplarModal() {
-      document.getElementById('exemplarModal').classList.add('hidden');
-    }
-
-    // Initialize Diagnostic Form (Tab 2)
-    function renderMatrixForm() {
-      dimensionsListEl.innerHTML = '';
-
-      dimensionsData.forEach(dim => {
-        const currentTier = userScores[dim.id];
-        
-        const card = document.createElement('div');
-        card.className = "p-4 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-lg transition space-y-3 cursor-pointer";
-        card.onclick = (e) => {
-          if(!e.target.closest('input')) {
-            openDrawer(dim.id);
-          }
-        };
-
-        card.innerHTML = `
-          <div class="flex justify-between items-start gap-2">
-            <div>
-              <span class="text-[10px] font-bold uppercase tracking-wider text-tamu-maroon bg-amber-100 px-2 py-0.5 rounded border border-amber-200">Dimension ${dim.id}</span>
-              <h3 class="text-sm font-bold text-slate-800 mt-1">${dim.name}</h3>
-            </div>
-            <button onclick="openDrawer(${dim.id}); event.stopPropagation();" class="text-xs font-semibold text-tamu-maroon hover:text-tamu-light flex items-center gap-1 bg-white px-2.5 py-1 rounded border border-slate-200 shadow-sm">
-              Inspect & Prompts <i class="fa-solid fa-chevron-right text-[10px]"></i>
+    <!-- Navigation Tabs -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 flex space-x-8 overflow-x-auto">
+            <button onclick="switchTab('matrix')" id="tab-matrix" class="tab-btn active py-4 px-2 text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-table-cells"></i> 1. HIPs Course Profile
             </button>
-          </div>
+            <button onclick="switchTab('diagnostic')" id="tab-diagnostic" class="tab-btn py-4 px-2 text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-chart-radar"></i> 2. Self-Assessment Diagnostic
+            </button>
+            <button onclick="switchTab('syllabus')" id="tab-syllabus" class="tab-btn py-4 px-2 text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-file-contract"></i> 3. Syllabus Language Builder
+            </button>
+            <button onclick="switchTab('aiprompt')" id="tab-aiprompt" class="tab-btn py-4 px-2 text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-robot"></i> 4. AI Prompt Builder Engine
+            </button>
+        </div>
+    </nav>
 
-          <div class="grid grid-cols-3 gap-2 pt-1">
-            ${[1, 2, 3].map(tierNum => `
-              <label class="flex items-center justify-center p-2 rounded border text-xs font-medium cursor-pointer transition select-none ${
-                currentTier === tierNum 
-                  ? 'bg-tamu-maroon text-amber-200 border-tamu-maroon shadow-sm font-bold' 
-                  : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
-              }">
-                <input type="radio" name="dim_${dim.id}" value="${tierNum}" ${currentTier === tierNum ? 'checked' : ''} 
-                       onchange="updateScore(${dim.id},${tierNum})" class="sr-only">
-                Tier ${tierNum}
-              </label>
-            `).join('')}
-          </div>
-        `;
-        dimensionsListEl.appendChild(card);
-      });
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-6">
 
-      updateBadge();
-    }
+        <!-- TAB 1: HIPs Course Profile (Fidelity Matrix) -->
+        <section id="sec-matrix" class="tab-content block">
+            <div class="mb-6 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold maroon-text mb-2"><i class="fa-solid fa-layer-group mr-2"></i>AAC&U Quality Elements & TAMU ULO Fidelity Matrix</h2>
+                <p class="text-sm text-slate-600">Select filter parameters or click any AAC&U Quality Element card below to view detailed fidelity descriptors across Foundational, Applied, and Integrated levels for STEM, Non-STEM, and Co-Curricular tracks.</p>
+                
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-100">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Disciplinary Track</label>
+                        <select id="matrix-track-filter" onchange="filterMatrix()" class="w-full text-sm border-slate-300 rounded-md shadow-sm p-2 bg-slate-50 border focus:ring-2 focus:ring-maroon-bg">
+                            <option value="all">All Tracks (STEM, Non-STEM, Co-Curricular)</option>
+                            <option value="stem">STEM Track</option>
+                            <option value="nonstem">Non-STEM / Humanities Track</option>
+                            <option value="cocurricular">Co-Curricular / Experiential</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Developmental Level</label>
+                        <select id="matrix-level-filter" onchange="filterMatrix()" class="w-full text-sm border-slate-300 rounded-md shadow-sm p-2 bg-slate-50 border focus:ring-2 focus:ring-maroon-bg">
+                            <option value="all">All Levels (Foundational, Applied, Integrated)</option>
+                            <option value="foundational">Foundational (Introductory/100-200 Level)</option>
+                            <option value="applied">Applied (Intermediate/300-400 Level)</option>
+                            <option value="integrated">Integrated (Advanced/Capstone/Graduate)</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="resetMatrixFilters()" class="w-full text-xs py-2 px-3 bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold rounded-md transition border border-slate-300">
+                            Reset View Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-    function updateScore(dimId, tier) {
-      userScores[dimId] = tier;
-      renderMatrixForm();
-      updateChart();
-      if (!actionDrawer.classList.contains('translate-x-full') && currentInspectedDimId === dimId) {
-        populateDrawer(dimId);
-      }
-    }
+            <div id="elements-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </section>
 
-    function updateBadge() {
-      completionBadgeEl.innerText = `8/8 Completed`;
-    }
+        <!-- TAB 2: Self-Assessment Diagnostic Tool -->
+        <section id="sec-diagnostic" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Input Panel -->
+                <div class="lg:col-span-7 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h2 class="text-lg font-bold maroon-text mb-1"><i class="fa-solid fa-list-check mr-2"></i>HIP Fidelity Self-Assessment</h2>
+                    <p class="text-xs text-slate-500 mb-5">Rate your course on each AAC&U element (0 = Absent, 1 = Developing, 2 = Proficient, 3 = Exemplary).</p>
 
-    // Initialize Radar Chart (Tab 2)
-    function initRadarChart() {
-      const ctx = document.getElementById('hipsRadarChart').getContext('2d');
-      
-      chartInstance = new Chart(ctx, {
-        type: 'radar',
-        data: {
-          labels: dimensionsData.map(d => d.shortName),
-          datasets: [{
-            label: 'Current HIPs Tier',
-            data: dimensionsData.map(d => userScores[d.id]),
-            backgroundColor: 'rgba(80, 0, 0, 0.25)',
-            borderColor: 'rgba(80, 0, 0, 1)',
-            borderWidth: 2.5,
-            pointBackgroundColor: '#d4af37',
-            pointBorderColor: '#500000',
-            pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: '#500000',
-            pointRadius: 5
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          scales: {
-            r: {
-              min: 0,
-              max: 3,
-              ticks: { stepSize: 1, display: true, backdropColor: 'transparent' },
-              grid: { color: '#e2e8f0' },
-              angleLines: { color: '#cbd5e1' },
-              pointLabels: { font: { size: 10, weight: '700' }, color: '#334155' }
+                    <form id="diagnostic-form" class="space-y-4">
+                        <!-- Questions JS populated -->
+                    </form>
+                </div>
+
+                <!-- Live Results Panel -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm sticky top-20">
+                        <h3 class="text-base font-bold text-slate-800 mb-2">Fidelity Profile & ULO Alignment</h3>
+                        
+                        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200 mb-4">
+                            <div>
+                                <span class="text-xs uppercase tracking-wider text-slate-500 font-semibold">Overall Fidelity Tier</span>
+                                <div id="tier-label" class="text-xl font-black text-amber-600">Developing HIP</div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs uppercase tracking-wider text-slate-500 font-semibold">Total Score</span>
+                                <div id="total-score" class="text-2xl font-black maroon-text">12 / 24</div>
+                            </div>
+                        </div>
+
+                        <!-- Radar Chart -->
+                        <div class="relative w-full aspect-square max-h-[280px] mx-auto mb-4">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+
+                        <!-- TAMU ULO Coverage Summary -->
+                        <div class="border-t border-slate-100 pt-3">
+                            <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">TAMU ULO Coverage Map</h4>
+                            <div id="ulo-coverage-list" class="space-y-1.5 text-xs">
+                                <!-- JS Populated ULO Badges -->
+                            </div>
+                        </div>
+
+                        <button onclick="window.print()" class="w-full mt-4 py-2 text-xs font-bold bg-slate-800 text-white rounded-md hover:bg-slate-900 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-print"></i> Print Diagnostic Summary Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: Syllabus Language Builder -->
+        <section id="sec-syllabus" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Configuration Form -->
+                <div class="lg:col-span-5 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h2 class="text-lg font-bold maroon-text mb-4"><i class="fa-solid fa-pen-to-square mr-2"></i>Syllabus Language Parameters</h2>
+                    
+                    <div class="space-y-4 text-sm">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Course Title & Number</label>
+                            <input type="text" id="syl-course" value="STAT 485: Directed Capstone Research" class="w-full p-2 border rounded-md text-sm border-slate-300 focus:ring-2 focus:ring-maroon-bg">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">High-Impact Practice Type</label>
+                            <select id="syl-hiptype" class="w-full p-2 border rounded-md text-sm border-slate-300 focus:ring-2 focus:ring-maroon-bg">
+                                <option value="Undergraduate Research">Undergraduate Research</option>
+                                <option value="Service-Learning / Community Engagement">Service-Learning / Community Engagement</option>
+                                <option value="Internship / Field Experience">Internship / Field Experience</option>
+                                <option value="Capstone Course & Project">Capstone Course & Project</option>
+                                <option value="Global Learning / Study Abroad">Global Learning / Study Abroad</option>
+                                <option value="Writing-Intensive Experience">Writing-Intensive Experience</option>
+                                <option value="First-Year Seminar">First-Year Seminar</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Developmental Level</label>
+                            <select id="syl-level" class="w-full p-2 border rounded-md text-sm border-slate-300 focus:ring-2 focus:ring-maroon-bg">
+                                <option value="Foundational">Foundational (100-200 Level)</option>
+                                <option value="Applied">Applied (300-400 Level)</option>
+                                <option value="Integrated" selected>Integrated (Capstone/Advanced)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Disciplinary Track</label>
+                            <select id="syl-track" class="w-full p-2 border rounded-md text-sm border-slate-300 focus:ring-2 focus:ring-maroon-bg">
+                                <option value="STEM">STEM</option>
+                                <option value="Non-STEM / Humanities">Non-STEM / Humanities</option>
+                                <option value="Co-Curricular / Experiential">Co-Curricular / Experiential</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Primary AAC&U Elements Included</label>
+                            <div class="grid grid-cols-2 gap-2 text-xs max-h-40 overflow-y-auto p-2 border border-slate-200 rounded-md bg-slate-50">
+                                <label class="flex items-center space-x-2"><input type="checkbox" value="High Expectations" checked class="syl-elem"> <span>High Expectations</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" value="Time & Effort" checked class="syl-elem"> <span>Time & Effort</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" value="Peer/Faculty Interaction" checked class="syl-elem"> <span>Faculty/Peer Interaction</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" value="Diversity Experiences" checked class="syl-elem"> <span>Diversity Experiences</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" value="Frequent Feedback" checked class="syl-elem"> <span>Frequent Feedback</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" value="Real-World Application" checked class="syl-elem"> <span>Real-World Application</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" value="Public Demonstration" checked class="syl-elem"> <span>Public Demonstration</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" value="Reflection & Integration" checked class="syl-elem"> <span>Reflection & Integration</span></label>
+                            </div>
+                        </div>
+                        <button onclick="generateSyllabusLanguage()" class="w-full py-2.5 maroon-bg text-white font-bold rounded-md hover:opacity-90 transition text-sm">
+                            <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Generate Syllabus Components
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Output Display -->
+                <div class="lg:col-span-7 bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-200">
+                            <h3 class="text-base font-bold text-slate-800">Generated Syllabus Language Package</h3>
+                            <button onclick="copyToClipboard('syllabus-output')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded border border-slate-300 flex items-center gap-1">
+                                <i class="fa-regular fa-copy"></i> Copy Text
+                            </button>
+                        </div>
+                        <div id="syllabus-output" class="prose prose-sm max-w-none text-slate-700 space-y-4 text-xs leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-200 max-h-[520px] overflow-y-auto">
+                            <p class="text-slate-400 italic">Configure options on the left and click "Generate Syllabus Components" to build your custom syllabus text.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: AI Prompt Builder Engine -->
+        <section id="sec-aiprompt" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Settings Form -->
+                <div class="lg:col-span-5 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <h2 class="text-lg font-bold text-indigo-900 mb-4"><i class="fa-solid fa-sliders mr-2"></i>AI Instructional Assistant Configuration</h2>
+
+                    <div class="space-y-4 text-sm">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Pedagogical Goal</label>
+                            <select id="prompt-goal" class="w-full p-2 border rounded-md text-sm border-slate-300 focus:ring-2 focus:ring-indigo-500">
+                                <option value="assignment">Design High-Impact Assignment / Capstone Brief</option>
+                                <option value="reflection">Draft Structured Reflection & Integration Prompts</option>
+                                <option value="rubric">Create AAC&U & TAMU ULO Aligned Scoring Rubric</option>
+                                <option value="feedback">Establish Peer & Instructor Feedback Workflows</option>
+                                <option value="diversity">Integrate Diverse Perspectives & Real-World Contexts</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Target Generative AI Platform</label>
+                            <select id="prompt-ai" class="w-full p-2 border rounded-md text-sm border-slate-300 focus:ring-2 focus:ring-indigo-500">
+                                <option value="ChatGPT (GPT-4o)">ChatGPT / OpenAI GPT-4o</option>
+                                <option value="Claude 3.5 Sonnet">Claude 3.5 Sonnet (Anthropic)</option>
+                                <option value="Microsoft Copilot">Microsoft Copilot (TAMU Enterprise)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Disciplinary Domain / Topic</label>
+                            <input type="text" id="prompt-topic" value="Biomedical Engineering Senior Design" class="w-full p-2 border rounded-md text-sm border-slate-300 focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Focus AAC&U Quality Elements</label>
+                            <select id="prompt-element" class="w-full p-2 border rounded-md text-sm border-slate-300 focus:ring-2 focus:ring-indigo-500">
+                                <option value="Reflection & Integration of Learning">Reflection & Integration of Learning</option>
+                                <option value="Public Demonstration of Competence">Public Demonstration of Competence</option>
+                                <option value="Periodic, Structured Opportunities to Apply Learning">Periodic, Structured Application</option>
+                                <option value="Frequent, Timely, and Constructive Feedback">Frequent & Constructive Feedback</option>
+                            </select>
+                        </div>
+                        <button onclick="generateAIPrompt()" class="w-full py-2.5 bg-indigo-700 text-white font-bold rounded-md hover:bg-indigo-800 transition text-sm">
+                            <i class="fa-solid fa-microchip mr-2"></i>Build System Prompt
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Prompt Code Output -->
+                <div class="lg:col-span-7 bg-slate-900 text-slate-100 p-6 rounded-xl border border-slate-800 shadow-md flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-800">
+                            <span class="text-xs font-mono text-indigo-400 font-semibold"><i class="fa-solid fa-terminal mr-2"></i>Structured Master AI Prompt</span>
+                            <button onclick="copyToClipboard('prompt-output')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-xs rounded border border-slate-700 flex items-center gap-1">
+                                <i class="fa-regular fa-copy"></i> Copy Prompt
+                            </button>
+                        </div>
+                        <pre id="prompt-output" class="whitespace-pre-wrap font-mono text-xs leading-relaxed text-indigo-100 max-h-[500px] overflow-y-auto bg-slate-950 p-4 rounded-lg border border-slate-800">Click "Build System Prompt" to generate a tailored instruction prompt for your selected AI model.</pre>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-800 text-xs text-slate-400 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-indigo-400"></i>
+                        <span>Copy and paste this structured prompt into your preferred AI LLM interface to receive pedagogy-aligned outputs.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Dialog for Matrix Card Details -->
+    <div id="matrix-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200">
+            <div class="maroon-bg text-white p-5 flex justify-between items-start">
+                <div>
+                    <span id="modal-num" class="text-xs font-bold text-amber-300 uppercase tracking-wider">Quality Element #</span>
+                    <h3 id="modal-title" class="text-xl font-bold">Element Title</h3>
+                </div>
+                <button onclick="closeModal()" class="text-white hover:text-amber-200 text-xl font-bold">&times;</button>
+            </div>
+            <div class="p-6 max-h-[70vh] overflow-y-auto text-slate-700 space-y-4 text-xs leading-relaxed">
+                <div class="p-3 bg-amber-50 rounded-lg border border-amber-200 text-amber-900 font-medium" id="modal-desc">
+                    Description text...
+                </div>
+
+                <div class="space-y-3">
+                    <h4 class="font-bold text-sm maroon-text border-b border-slate-200 pb-1">Developmental Rubrics Across Tracks</h4>
+                    
+                    <div class="bg-slate-50 p-3 rounded-md border border-slate-200">
+                        <div class="font-bold text-slate-800 mb-1"><i class="fa-solid fa-seedling mr-1.5 text-emerald-600"></i>Foundational Level</div>
+                        <p id="modal-foundational">Foundational descriptors...</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-3 rounded-md border border-slate-200">
+                        <div class="font-bold text-slate-800 mb-1"><i class="fa-solid fa-gears mr-1.5 text-blue-600"></i>Applied Level</div>
+                        <p id="modal-applied">Applied descriptors...</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-3 rounded-md border border-slate-200">
+                        <div class="font-bold text-slate-800 mb-1"><i class="fa-solid fa-crown mr-1.5 text-purple-600"></i>Integrated Level</div>
+                        <p id="modal-integrated">Integrated descriptors...</p>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <h4 class="font-bold text-xs text-slate-600 uppercase tracking-wider mb-2">Mapped TAMU ULOs</h4>
+                    <div id="modal-ulos" class="flex flex-wrap gap-1.5">
+                        <!-- Badges -->
+                    </div>
+                </div>
+            </div>
+            <div class="bg-slate-100 px-6 py-3 border-t border-slate-200 text-right">
+                <button onclick="closeModal()" class="px-4 py-1.5 maroon-bg text-white font-bold text-xs rounded hover:opacity-90">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Embedded Data & Application Logic -->
+    <script>
+        // AAC&U Quality Elements Data Engine
+        const elementsData = [
+            {
+                id: 1,
+                title: "High Expectations for Performance",
+                shortDesc: "Setting appropriately ambitious standards that challenge students beyond baseline compliance.",
+                ulos: ["Master Depth of Knowledge", "Critical Thinking"],
+                foundational: "Clear grading criteria with explicit samples of novice vs. proficient work.",
+                applied: "Student-involved standard setting with multi-stage project milestones.",
+                integrated: "Professional benchmark expectations aligned with industry or scholarly publication standards."
+            },
+            {
+                id: 2,
+                title: "Significant Time and Effort",
+                shortDesc: "Sustained engagement demanding intensive intellectual, empirical, or creative investment over time.",
+                ulos: ["Master Depth of Knowledge", "Lifelong Learning"],
+                foundational: "Weekly structured practice logs and progressive milestone submissions.",
+                applied: "Multi-week lab, field work, or research project requiring independent time management.",
+                integrated: "Semester-long capstone/thesis or clinical immersion demanding >150 total active effort hours."
+            },
+            {
+                id: 3,
+                title: "Interactions with Faculty and Peers",
+                shortDesc: "Substantive, frequent interactions on academic topics between students, instructors, and peers.",
+                ulos: ["Collaborative Teamwork", "Communication"],
+                foundational: "Structured small-group discussion protocols and weekly instructor Q&A checkpoints.",
+                applied: "Peer review cycles, collaborative research teams, and regular faculty mentoring touchpoints.",
+                integrated: "Co-authorship, professional committee participation, or client-faculty-student triad meetings."
+            },
+            {
+                id: 4,
+                title: "Experiences with Diversity",
+                shortDesc: "Exposure to diverse people, perspectives, worldviews, and complex societal challenges.",
+                ulos: ["Personal & Social Responsibility", "Communication"],
+                foundational: "Readings and case studies featuring underrepresented global perspectives and diverse authors.",
+                applied: "Community-engaged fieldwork or cross-disciplinary team problem solving.",
+                integrated: "International immersive study/research or collaborative projects directly with diverse community stakeholders."
+            },
+            {
+                id: 5,
+                title: "Frequent, Timely, and Constructive Feedback",
+                shortDesc: "Continuous formative feedback loops allowing students to revise and improve before final evaluations.",
+                ulos: ["Critical Thinking", "Lifelong Learning"],
+                foundational: "Automated low-stakes quizzes and quick instructor comments within 48 hours.",
+                applied: "Iterative draft-feedback-revision workflows with detailed rubrics for major deliverables.",
+                integrated: "Expert panel feedback, client design reviews, and multi-stage peer/instructor critiques."
+            },
+            {
+                id: 6,
+                title: "Structured Real-World Application",
+                shortDesc: "Opportunities to apply learned concepts, theories, and skills to unscripted real-world situations.",
+                ulos: ["Critical Thinking", "Master Depth of Knowledge"],
+                foundational: "Simulated case studies, dataset analyses, or authentic scenario-based problem sets.",
+                applied: "Client-sponsored projects, field surveys, or laboratory experimental design.",
+                integrated: "Full internship, clinical residency, community service-learning project, or commercial capstone."
+            },
+            {
+                id: 7,
+                title: "Public Demonstration of Competence",
+                shortDesc: "Presenting, defending, or publishing work to audiences beyond the classroom setting.",
+                ulos: ["Communication", "Personal & Social Responsibility"],
+                foundational: "In-class team presentations or digital poster session visible to course peers.",
+                applied: "Departmental symposium presentation, public website launch, or client deliverable handover.",
+                integrated: "Regional/national conference presentation, peer-reviewed submission, or public community showcase."
+            },
+            {
+                id: 8,
+                title: "Reflection and Integration of Learning",
+                shortDesc: "Structured opportunities to synthesize knowledge, link theory to practice, and evaluate personal growth.",
+                ulos: ["Lifelong Learning", "Personal & Social Responsibility"],
+                foundational: "Weekly guided entry/exit tickets and brief muddiest-point reflections.",
+                applied: "Midterm and final structured reflective essays connecting course concepts to career goals.",
+                integrated: "Comprehensive ePortfolio, synthesis capstone reflection, or professional philosophy defense."
             }
-          },
-          plugins: {
-            legend: { display: false }
-          },
-          onClick: (evt, activeElements) => {
-            if (activeElements.length > 0) {
-              const index = activeElements[0].index;
-              openDrawer(dimensionsData[index].id);
-            }
-          }
-        }
-      });
-    }
+        ];
 
-    function updateChart() {
-      if (chartInstance) {
-        chartInstance.data.datasets[0].data = dimensionsData.map(d => userScores[d.id]);
-        chartInstance.update();
-      }
-    }
+        let radarChartInstance = null;
 
-    // Drawer System (Tab 2)
-    function openDrawer(dimId) {
-      currentInspectedDimId = dimId;
-      populateDrawer(dimId);
-      
-      drawerBackdrop.classList.remove('hidden');
-      setTimeout(() => {
-        drawerBackdrop.classList.remove('opacity-0');
-        actionDrawer.classList.remove('translate-x-full');
-      }, 10);
-    }
-
-    function closeDrawer() {
-      actionDrawer.classList.add('translate-x-full');
-      drawerBackdrop.classList.add('opacity-0');
-      setTimeout(() => {
-        drawerBackdrop.classList.add('hidden');
-      }, 300);
-    }
-
-    function populateDrawer(dimId) {
-      const dim = dimensionsData.find(d => d.id === dimId);
-      const currentTier = userScores[dimId];
-      const tierData = dim.tiers[currentTier];
-
-      drawerDimCategory.innerText = `Dimension ${dim.id}`;
-      drawerDimTitle.innerText = dim.name;
-      
-      drawerTierBadge.innerHTML = `
-        <i class="fa-solid fa-layer-group text-amber-300"></i> Currently Set to: <strong>Tier ${currentTier}</strong>
-      `;
-
-      drawerStatusText.innerText = `${tierData.title}`;
-      drawerDescriptor.innerText = tierData.descriptor;
-      drawerRecommendation.innerText = tierData.recommendation;
-      drawerAiPrompt.innerText = tierData.aiPrompt;
-    }
-
-    // Dynamic Generator Logic (Tab 3)
-    function generateSyllabusPackage() {
-      const hipType = document.getElementById('genHipType').value;
-      const domain = document.getElementById('genDomain').value;
-      const ulo = document.getElementById('genUlo').value;
-
-      const hipNames = {
-        research: "Undergraduate Research & Inquiry",
-        service: "Service-Learning & Community Engagement",
-        global: "Global Learning & Cultural Competence",
-        capstone: "Culminating Senior Capstone Experience",
-        internship: "Professional Field Internship",
-        writing: "Collaborative Writing-Intensive Seminar"
-      };
-
-      const domainNames = {
-        stem: "STEM & Health Sciences",
-        humanities: "Humanities, Arts & Social Sciences",
-        business: "Business & Professional Studies",
-        cocurricular: "Co-Curricular & Student Leadership"
-      };
-
-      const uloNames = {
-        critical: "Critical Thinking & Problem Solving",
-        communication: "Effective Communication",
-        cultural: "Social & Cultural Competence",
-        knowledge: "Mastery of Disciplinary Knowledge",
-        lifelong: "Personal & Lifelong Learning"
-      };
-
-      // 1. Syllabus Statement
-      const statement = `COURSE HIGH-IMPACT PRACTICE (HIP) COMMITMENT:
-This course is officially designated as a High-Impact Practice in ${hipNames[hipType]} tailored for ${domainNames[domain]}. 
-
-In alignment with Texas A&M University Learning Outcomes (ULOs), students will engage in sustained intellectual effort, iterative drafting/feedback, and authentic real-world applications. Through scaffolded milestone deliverables, peer collaboration, and structured self-reflection, you will cultivate advanced competency in ${uloNames[ulo]}.`;
-
-      // 2. Rubric Blueprint
-      const rubric = `ASSESSMENT RUBRIC FRAMEWORK (${hipNames[hipType]}):
-
-Criteria                  Exemplary (Tier 3)            Developing (Tier 2)           Foundational (Tier 1)
----------------------------------------------------------------------------------------------------------
-1. Disciplinary Depth     Demonstrates thorough mastery  Applies concepts accurately    Recalls basic concepts;
-                          and analytical synthesis.      with minor gaps in rigor.     lacks deep analysis.
-
-2. Iterative Growth       Integrates feedback seamlessly  Addresses major feedback      Minimal revision; treats
-                          across project milestones.    points with prompt guidance.   drafts transactionally.
-
-3. Authentic Deliverable  Produces professional-grade    Produces functional work with  Fails to align deliverable
-                          work suitable for public/    limited stakeholder alignment. with professional standard.
-                          client presentation.
-
-4. Reflection & Synthesis Articulates deep connections   Reflects on task progress but  Offers superficial summary
-                          between learning and goals.   misses cross-domain links.     without self-evaluation.`;
-
-      // 3. TAMU ULO Alignment Table
-      const uloMapping = `TEXAS A&M UNIVERSITY LEARNING OUTCOME (ULO) ALIGNMENT MATRIX:
-
-Primary ULO Target: ${uloNames[ulo]}
-HIP Classification: ${hipNames[hipType]}
-
-• Course Learning Objective (CLO 1): Students will evaluate complex disciplinary problems using real-world data and evidence.
-  - Assessment Method: Scaffolded Project Milestone Submissions & Peer Review Loops.
-  - Target Mastery Indicator: 85%+ of students achieve 'Exemplary' or 'Developing' tier on analytical rubric criteria.
-
-• Course Learning Objective (CLO 2): Students will communicate findings clearly to diverse stakeholders and public audiences.
-  - Assessment Method: Final Public Defense / Poster Presentation Showcase.
-  - Target Mastery Indicator: Evaluated using institutional rubric for ${uloNames[ulo]}.`;
-
-      document.getElementById('generatedSyllabus').innerText = statement;
-      document.getElementById('generatedRubric').innerText = rubric;
-      document.getElementById('generatedUlo').innerText = uloMapping;
-
-      showToast("Syllabus & Rubric package generated!");
-    }
-
-    function copyGeneratedText(elementId) {
-      const text = document.getElementById(elementId).innerText;
-      navigator.clipboard.writeText(text).then(() => {
-        showToast("Text copied to clipboard!");
-      });
-    }
-
-    // App Initialization & Listeners
-    document.addEventListener('DOMContentLoaded', () => {
-      renderMatrixForm();
-      generateSyllabusPackage();
-
-      closeDrawerBtn.onclick = closeDrawer;
-      drawerCloseFooterBtn.onclick = closeDrawer;
-      drawerBackdrop.onclick = closeDrawer;
-
-      resetBtn.onclick = () => {
-        userScores = { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1 };
-        renderMatrixForm();
-        updateChart();
-        showToast("Diagnostic form reset to Tier 1 default.");
-      };
-
-      copyPromptBtn.onclick = () => {
-        const textToCopy = drawerAiPrompt.innerText;
-        navigator.clipboard.writeText(textToCopy).then(() => {
-          showToast("AI Scaffolding Prompt copied to clipboard!");
+        // On DOM Load Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMatrixCards();
+            renderDiagnosticQuestions();
+            initRadarChart();
+            generateSyllabusLanguage();
+            generateAIPrompt();
         });
-      };
-    });
 
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      const toastMsg = document.getElementById('toastMsg');
-      toastMsg.innerText = msg;
-      
-      toast.classList.remove('translate-y-10', 'opacity-0');
-      setTimeout(() => {
-        toast.classList.add('translate-y-10', 'opacity-0');
-      }, 3000);
-    }
-  </script>
+        // TAB SWITCHING
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+
+            if(tabId === 'diagnostic' && radarChartInstance) {
+                setTimeout(() => radarChartInstance.resize(), 100);
+            }
+        }
+
+        // TAB 1 MATRIX RENDER
+        function renderMatrixCards() {
+            const container = document.getElementById('elements-grid');
+            container.innerHTML = '';
+
+            elementsData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between group hover:border-maroon-bg";
+                card.onclick = () => openModal(item.id);
+
+                const uloBadges = item.ulos.map(u => `<span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded-full font-medium border border-slate-200">${u}</span>`).join('');
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">Element 0${item.id}</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-slate-300 group-hover:text-maroon-bg transition text-xs"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-sm mb-2 group-hover:maroon-text transition">${item.title}</h3>
+                        <p class="text-slate-600 text-xs mb-4 line-clamp-3">${item.shortDesc}</p>
+                    </div>
+                    <div>
+                        <div class="text-[10px] uppercase font-bold text-slate-400 mb-1">Aligned TAMU ULOs</div>
+                        <div class="flex flex-wrap gap-1">${uloBadges}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterMatrix() {
+            renderMatrixCards();
+        }
+
+        function resetMatrixFilters() {
+            document.getElementById('matrix-track-filter').value = 'all';
+            document.getElementById('matrix-level-filter').value = 'all';
+            renderMatrixCards();
+        }
+
+        function openModal(id) {
+            const item = elementsData.find(e => e.id === id);
+            if(!item) return;
+
+            document.getElementById('modal-num').innerText = `AAC&U Quality Element #0${item.id}`;
+            document.getElementById('modal-title').innerText = item.title;
+            document.getElementById('modal-desc').innerText = item.shortDesc;
+
+            document.getElementById('modal-foundational').innerText = item.foundational;
+            document.getElementById('modal-applied').innerText = item.applied;
+            document.getElementById('modal-integrated').innerText = item.integrated;
+
+            const uloContainer = document.getElementById('modal-ulos');
+            uloContainer.innerHTML = item.ulos.map(u => `<span class="bg-maroon-bg text-white text-xs px-2.5 py-1 rounded-md font-medium">${u}</span>`).join('');
+
+            document.getElementById('matrix-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('matrix-modal').classList.add('hidden');
+        }
+
+        // TAB 2 DIAGNOSTIC ENGINE
+        function renderDiagnosticQuestions() {
+            const form = document.getElementById('diagnostic-form');
+            form.innerHTML = '';
+
+            elementsData.forEach((item, index) => {
+                const qBlock = document.createElement('div');
+                qBlock.className = "p-3.5 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-2";
+                qBlock.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-800">${index + 1}. ${item.title}</span>
+                        <span id="score-val-${item.id}" class="font-black text-maroon-bg">2</span>
+                    </div>
+                    <input type="range" min="0" max="3" value="2" step="1" id="input-elem-${item.id}" onchange="updateDiagnostic()" oninput="document.getElementById('score-val-${item.id}').innerText = this.value" class="w-full accent-[#500000]">
+                    <div class="flex justify-between text-[10px] text-slate-500">
+                        <span>0: Absent</span>
+                        <span>1: Developing</span>
+                        <span>2: Proficient</span>
+                        <span>3: Exemplary</span>
+                    </div>
+                `;
+                form.appendChild(qBlock);
+            });
+            updateDiagnostic();
+        }
+
+        function initRadarChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['High Expect.', 'Time & Effort', 'Faculty/Peer', 'Diversity', 'Feedback', 'Real-World', 'Public Demo', 'Reflection'],
+                    datasets: [{
+                        label: 'Fidelity Level',
+                        data: [2, 2, 2, 2, 2, 2, 2, 2],
+                        backgroundColor: 'rgba(80, 0, 0, 0.2)',
+                        borderColor: '#500000',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#500000'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 3,
+                            ticks: { stepSize: 1, display: false }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function updateDiagnostic() {
+            let total = 0;
+            const scores = [];
+            
+            elementsData.forEach(item => {
+                const val = parseInt(document.getElementById(`input-elem-${item.id}`).value) || 0;
+                scores.push(val);
+                total += val;
+            });
+
+            document.getElementById('total-score').innerText = `${total} / 24`;
+
+            const tierLabel = document.getElementById('tier-label');
+            if (total < 10) {
+                tierLabel.innerText = "Emerging HIP";
+                tierLabel.className = "text-xl font-black text-red-600";
+            } else if (total < 18) {
+                tierLabel.innerText = "Developing HIP";
+                tierLabel.className = "text-xl font-black text-amber-600";
+            } else {
+                tierLabel.innerText = "High-Fidelity Exemplary HIP";
+                tierLabel.className = "text-xl font-black text-emerald-700";
+            }
+
+            if(radarChartInstance) {
+                radarChartInstance.data.datasets[0].data = scores;
+                radarChartInstance.update();
+            }
+
+            // Update ULO List Summary
+            const ulos = [
+                { name: "Master Depth of Knowledge", count: (scores[0] + scores[1] + scores[5]) },
+                { name: "Demonstrate Critical Thinking", count: (scores[0] + scores[4] + scores[5]) },
+                { name: "Communicate Effectively", count: (scores[2] + scores[3] + scores[6]) },
+                { name: "Collaborative Teamwork", count: (scores[2]) },
+                { name: "Personal & Social Responsibility", count: (scores[3] + scores[6] + scores[7]) },
+                { name: "Lifelong Learning & Integration", count: (scores[1] + scores[4] + scores[7]) }
+            ];
+
+            const container = document.getElementById('ulo-coverage-list');
+            container.innerHTML = ulos.map(u => `
+                <div class="flex justify-between items-center p-1.5 bg-slate-50 rounded border border-slate-100">
+                    <span class="text-slate-700 font-medium">${u.name}</span>
+                    <span class="font-bold ${u.count > 4 ? 'text-emerald-600' : 'text-slate-500'}">${u.count} pts</span>
+                </div>
+            `).join('');
+        }
+
+        // TAB 3 SYLLABUS BUILDER
+        function generateSyllabusLanguage() {
+            const course = document.getElementById('syl-course').value;
+            const hiptype = document.getElementById('syl-hiptype').value;
+            const level = document.getElementById('syl-level').value;
+            const track = document.getElementById('syl-track').value;
+
+            const selectedElems = Array.from(document.querySelectorAll('.syl-elem:checked')).map(cb => cb.value);
+
+            const output = `
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-bold text-slate-800 border-b pb-1 mb-1">1. Course Description & High-Impact Framework</h4>
+                        <p><strong>${course}</strong> is designated as an intensive <strong>${level} ${hiptype}</strong> experience embedded in the <strong>${track}</strong> curriculum. Built upon Texas A&M University High-Impact Practice guidelines, this course engages students through ${selectedElems.join(', ')} to cultivate deep disciplinary competence and real-world problem-solving capabilities.</p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-slate-800 border-b pb-1 mb-1">2. High-Impact Student Learning Outcomes (SLOs)</h4>
+                        <p>Upon successful completion of this course, students will be able to:</p>
+                        <ul class="list-disc pl-5 space-y-1 mt-1">
+                            <li>Synthesize core theoretical knowledge to address authentic, unscripted problems in ${track}. (<em>TAMU ULO: Depth of Knowledge & Critical Thinking</em>)</li>
+                            <li>Engage in continuous revision workflows guided by peer and instructor feedback. (<em>TAMU ULO: Lifelong Learning</em>)</li>
+                            <li>Formulate and execute a collaborative project demonstrating ethical and professional standards. (<em>TAMU ULO: Teamwork & Personal Responsibility</em>)</li>
+                            <li>Publicly communicate complex findings through professional written, oral, or visual media. (<em>TAMU ULO: Communication</em>)</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-slate-800 border-b pb-1 mb-1">3. Reflection & Assessment Policy</h4>
+                        <p>Assessment in this course prioritizes formative growth and integrative reflection. Major assignments undergo iterative review before final public submission. Guided reflective logs are submitted at key project milestones to document intellectual development and real-world application.</p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-slate-800 border-b pb-1 mb-1">4. Explicit TAMU ULO Alignment Statement</h4>
+                        <p class="p-2 bg-slate-100 rounded text-[11px] font-mono text-slate-600">
+                            [TAMU ULO MAP: Master Depth of Knowledge | Critical Thinking | Effective Communication | Collaborative Teamwork | Personal & Social Responsibility | Lifelong Learning]
+                        </p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('syllabus-output').innerHTML = output;
+        }
+
+        // TAB 4 AI PROMPT BUILDER
+        function generateAIPrompt() {
+            const goal = document.getElementById('prompt-goal').value;
+            const ai = document.getElementById('prompt-ai').value;
+            const topic = document.getElementById('prompt-topic').value;
+            const elem = document.getElementById('prompt-element').value;
+
+            const promptText = `SYSTEM PROMPT & INSTRUCTION FRAMEWORK (${ai})
+
+Role: Expert Higher Education Pedagogical Designer specializing in AAC&U High-Impact Practices (HIPs) and Texas A&M University (TAMU) Learning Outcomes.
+
+Task: Help me design a high-fidelity ${goal} for a university course focused on "${topic}".
+
+Fidelity Focus:
+- Target AAC&U Quality Element: ${elem}
+- Disciplinary Context: ${topic}
+- Key University Learning Outcomes (ULOs) to embed: Critical Thinking, Communication, Real-World Problem Solving, and Reflective Practice.
+
+Please generate:
+1. A clear, step-by-step assignment/protocol brief for students.
+2. A transparent evaluation rubric (4 performance tiers: Novice, Developing, Proficient, Exemplary).
+3. Structured reflection prompts enabling students to synthesize their learning and link theory to practice.
+4. Specific guidelines for peer/instructor feedback loops.
+
+Format the output clearly using Markdown headings, tables, and actionable bullet points.`;
+
+            document.getElementById('prompt-output').innerText = promptText;
+        }
+
+        // UTILITY FUNCTIONS
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Text copied to clipboard!");
+            });
+        }
+    </script>
 </body>
 </html>
